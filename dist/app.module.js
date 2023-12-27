@@ -12,6 +12,12 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const post_module_1 = require("./post/post.module");
 const typeorm_1 = require("@nestjs/typeorm");
+const category_module_1 = require("./category/category.module");
+const user_roles_models_1 = require("./models/user-roles.models");
+const user_module_1 = require("./user/user.module");
+const dotenv = require("dotenv");
+const nest_access_control_1 = require("nest-access-control");
+dotenv.config();
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -21,13 +27,17 @@ exports.AppModule = AppModule = __decorate([
             post_module_1.PostModule,
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
-                host: 'localhost',
-                database: 'projet-web',
-                username: 'root',
-                password: '',
-                entities: ['dist/**/*.entity{.ts,.js}'],
-                port: 3306,
+                host: process.env.DB_HOST,
+                port: parseInt(process.env.DB_PORT),
+                username: process.env.DB_USERNAME || 'root',
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME,
+                entities: ['dist/**/*.entity{.js,.ts}'],
+                synchronize: true,
             }),
+            category_module_1.CategoryModule,
+            user_module_1.UserModule,
+            nest_access_control_1.AccessControlModule.forRoles(user_roles_models_1.roles),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

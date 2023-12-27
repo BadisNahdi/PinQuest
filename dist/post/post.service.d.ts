@@ -1,13 +1,20 @@
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
+import { Repository } from 'typeorm';
+import { User } from '../User/entities/user.entity';
+import { CategoryService } from '../category/category.service';
 export declare class PostService {
-    private readonly postRepository;
-    constructor(postRepository: Repository<Post>);
-    create(createPostDto: CreatePostDto): Promise<CreatePostDto & Post>;
-    findAll(): Promise<Post[]>;
+    private readonly repo;
+    private catService;
+    constructor(repo: Repository<Post>, catService: CategoryService);
+    create(createPostDto: CreatePostDto, user: User): Promise<Post>;
+    findAll(query?: string): Promise<Post[]>;
     findOne(id: number): Promise<Post>;
-    update(id: number, updatePostDto: UpdatePostDto): string;
-    remove(id: number): string;
+    findBySlug(slug: string): Promise<Post>;
+    update(slug: string, updatePostDto: UpdatePostDto): Promise<Post>;
+    remove(id: number): Promise<{
+        success: boolean;
+        post: Post;
+    }>;
 }
