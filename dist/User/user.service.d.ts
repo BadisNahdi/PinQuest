@@ -12,6 +12,6 @@ export declare class UserService {
         user: User;
     }>;
     register(createUserDto: CreateUserDto): Promise<User>;
-    verifyPassword(password: string, userHash: string): Promise<any>;
+    verifyPassword(password: string, userHash: string): Promise<boolean>;
     getOneUser(id: number): Promise<User>;
 }
