@@ -7,6 +7,7 @@ export declare class PostController {
     private readonly postService;
     constructor(postService: PostService);
     create(createPostDto: CreatePostDto, user: any): Promise<PostEntity>;
+    searchPosts(hashtags: string, title: string): Promise<PostEntity[]>;
     uploadPhoto(file: Express.Multer.File): {
         filePath: string;
     } | {

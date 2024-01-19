@@ -85,6 +85,25 @@ let PostService = class PostService {
         await this.repo.remove(post);
         return { success: true, post };
     }
+    async searchPosts(hashtags, title) {
+        const queryBuilder = this.repo.createQueryBuilder('post');
+        if (title) {
+            queryBuilder.where('post.title LIKE :title', { title: `%${title}%` });
+        }
+        if (hashtags && hashtags.length > 0) {
+            hashtags.forEach((hashtag, index) => {
+                const query = `FIND_IN_SET(:hashtag${index}, post.hashtags)`;
+                if (index === 0 && !title) {
+                    queryBuilder.where(query, { [`hashtag${index}`]: hashtag });
+                }
+                else {
+                    queryBuilder.orWhere(query, { [`hashtag${index}`]: hashtag });
+                }
+            });
+        }
+        return await queryBuilder.getMany();
+        return await queryBuilder.getMany();
+    }
 };
 exports.PostService = PostService;
 exports.PostService = PostService = __decorate([

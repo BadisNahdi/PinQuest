@@ -6,6 +6,7 @@ export declare class Post {
     title: string;
     content: string;
     slug: string;
+    hashtags: string[];
     categoryId: number;
     userId: number;
     category: Category;

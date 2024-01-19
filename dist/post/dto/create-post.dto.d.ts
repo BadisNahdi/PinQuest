@@ -3,6 +3,7 @@ export declare class CreatePostDto {
     title: string;
     content: string;
     categoryId: number;
-    mainImageUrl: string;
     category: Category;
+    mainImageUrl: string;
+    hashtags: string[];
 }

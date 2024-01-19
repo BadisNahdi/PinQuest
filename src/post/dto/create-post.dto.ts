@@ -1,5 +1,12 @@
+import { Type } from 'class-transformer';
 import { Category } from './../../category/entities/category.entity';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
@@ -12,11 +19,16 @@ export class CreatePostDto {
 
   @IsNumber()
   @IsOptional()
+  @Type(() => Number)
   categoryId: number;
+
+  @IsOptional()
+  category: Category;
 
   @IsString()
   mainImageUrl: string;
 
+  @IsArray()
   @IsOptional()
-  category: Category;
+  hashtags: string[];
 }

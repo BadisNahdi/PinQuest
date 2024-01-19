@@ -17,7 +17,6 @@ export class PostService {
     const post = new Post();
     post.userId = user.id;
     Object.assign(post, createPostDto);
-
     this.repo.create(post);
     return await this.repo.save(post);
   }
@@ -83,5 +82,28 @@ export class PostService {
     const post = await this.repo.findOneBy({ id });
     await this.repo.remove(post);
     return { success: true, post };
+  }
+
+  async searchPosts(hashtags: string[], title: string): Promise<Post[]> {
+    const queryBuilder = this.repo.createQueryBuilder('post');
+
+    if (title) {
+      queryBuilder.where('post.title LIKE :title', { title: `%${title}%` });
+    }
+
+    if (hashtags && hashtags.length > 0) {
+      hashtags.forEach((hashtag, index) => {
+        const query = `FIND_IN_SET(:hashtag${index}, post.hashtags)`;
+        if (index === 0 && !title) {
+          queryBuilder.where(query, { [`hashtag${index}`]: hashtag });
+        } else {
+          queryBuilder.orWhere(query, { [`hashtag${index}`]: hashtag });
+        }
+      });
+    }
+
+    return await queryBuilder.getMany();
+
+    return await queryBuilder.getMany();
   }
 }

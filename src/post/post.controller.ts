@@ -27,6 +27,7 @@ import { UserRoles } from 'src/models/user-roles.models';
 import { Roles } from 'src/user/user.roles.decorator';
 import { Post as PostEntity } from './entities/post.entity';
 import { RolesGuard } from 'src/user/user.roles.guard';
+import { CurrentUser } from 'src/user/user.decorator';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -35,8 +36,18 @@ export class PostController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), ACGuard)
-  create(@Body() createPostDto: CreatePostDto, @User_() user) {
+  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user) {
+    console.log(user);
     return this.postService.create(createPostDto, user);
+  }
+
+  @Get('search')
+  async searchPosts(
+    @Query('hashtags') hashtags: string,
+    @Query('title') title: string,
+  ) {
+    const hashtagArray = hashtags ? hashtags.split(',') : [];
+    return this.postService.searchPosts(hashtagArray, title);
   }
 
   @Post('upload-photo')

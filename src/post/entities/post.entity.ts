@@ -26,6 +26,9 @@ export class Post {
   @Column()
   slug: string;
 
+  @Column({ type: 'simple-array' })
+  hashtags: string[];
+
   @Column({ default: 3 })
   categoryId: number;
 

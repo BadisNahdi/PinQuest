@@ -41,6 +41,10 @@ __decorate([
     __metadata("design:type", String)
 ], Post.prototype, "slug", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'simple-array' }),
+    __metadata("design:type", Array)
+], Post.prototype, "hashtags", void 0);
+__decorate([
     (0, typeorm_1.Column)({ default: 3 }),
     __metadata("design:type", Number)
 ], Post.prototype, "categoryId", void 0);

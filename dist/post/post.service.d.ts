@@ -17,4 +17,5 @@ export declare class PostService {
         success: boolean;
         post: Post;
     }>;
+    searchPosts(hashtags: string[], title: string): Promise<Post[]>;
 }
