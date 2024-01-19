@@ -22,6 +22,9 @@ const passport_1 = require("@nestjs/passport");
 const nest_access_control_1 = require("nest-access-control");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
+const user_roles_models_1 = require("../models/user-roles.models");
+const user_roles_decorator_1 = require("../user/user.roles.decorator");
+const user_roles_guard_1 = require("../user/user.roles.guard");
 let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
@@ -58,6 +61,9 @@ let PostController = class PostController {
         return this.postService.update(slug, updatePostDto);
     }
     remove(id) {
+        if (!this.postService.findOne(+id)) {
+            throw new common_1.NotFoundException('Could not find the post to delete');
+        }
         return this.postService.remove(+id);
     }
 };
@@ -65,11 +71,6 @@ exports.PostController = PostController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
-    (0, nest_access_control_1.UseRoles)({
-        resource: 'posts',
-        action: 'create',
-        possession: 'any',
-    }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, userv2_decorator_1.User_)()),
     __metadata("design:type", Function),
@@ -145,16 +146,12 @@ __decorate([
 ], PostController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
-    (0, nest_access_control_1.UseRoles)({
-        resource: 'posts',
-        action: 'delete',
-        possession: 'any',
-    }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), user_roles_guard_1.RolesGuard),
+    (0, user_roles_decorator_1.Roles)(user_roles_models_1.UserRoles.Reader),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PostController.prototype, "remove", null);
 exports.PostController = PostController = __decorate([
     (0, common_1.Controller)('posts'),

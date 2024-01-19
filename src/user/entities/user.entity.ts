@@ -1,8 +1,14 @@
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  BeforeInsert,
+} from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Post } from '../../post/entities/post.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 import { UserRoles } from '../../models/user-roles.models';
-
 
 @Entity('users')
 export class User {
@@ -24,11 +30,19 @@ export class User {
   @Column({ default: null })
   profilePic: string;
 
-  @Column({ type: 'enum', enum: UserRoles, enumName: 'roles', default: UserRoles.Reader })
+  @Column({
+    type: 'enum',
+    enum: UserRoles,
+    enumName: 'roles',
+    default: UserRoles.Reader,
+  })
   roles: UserRoles;
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 
   @BeforeInsert()
   hashPass() {

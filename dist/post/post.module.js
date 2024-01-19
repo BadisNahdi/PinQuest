@@ -18,13 +18,10 @@ let PostModule = class PostModule {
 exports.PostModule = PostModule;
 exports.PostModule = PostModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            (0, common_1.forwardRef)(() => category_module_1.CategoryModule),
-            typeorm_1.TypeOrmModule.forFeature([post_entity_1.Post]),
-        ],
+        imports: [(0, common_1.forwardRef)(() => category_module_1.CategoryModule), typeorm_1.TypeOrmModule.forFeature([post_entity_1.Post])],
         controllers: [post_controller_1.PostController],
         providers: [post_service_1.PostService],
-        exports: [post_service_1.PostService],
+        exports: [post_service_1.PostService, typeorm_1.TypeOrmModule],
     })
 ], PostModule);
 //# sourceMappingURL=post.module.js.map

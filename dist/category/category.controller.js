@@ -22,7 +22,14 @@ let CategoryController = class CategoryController {
     constructor(categoryService) {
         this.categoryService = categoryService;
     }
-    create(createCategoryDto) {
+    create(req, createCategoryDto) {
+        if (!req.cookies['Authentication']) {
+            throw new common_1.UnauthorizedException('No authorization token provided');
+        }
+        const token = req.cookies['Authentication'].split(' ');
+        if (!token) {
+            throw new common_1.UnauthorizedException('Invalid authorization token format');
+        }
         return this.categoryService.create(createCategoryDto);
     }
     findAll() {
@@ -37,14 +44,19 @@ let CategoryController = class CategoryController {
     remove(id, res) {
         return this.categoryService.remove(+id, res);
     }
+    async findPostsByCategory(categoryIds) {
+        const ids = categoryIds.split(',').map((id) => parseInt(id, 10));
+        return await this.categoryService.findPostsByCategories(ids);
+    }
 };
 exports.CategoryController = CategoryController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_category_dto_1.CreateCategoryDto]),
+    __metadata("design:paramtypes", [Object, create_category_dto_1.CreateCategoryDto]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "create", null);
 __decorate([
@@ -78,6 +90,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], CategoryController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('filter/posts'),
+    __param(0, (0, common_1.Query)('categoryIds')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CategoryController.prototype, "findPostsByCategory", null);
 exports.CategoryController = CategoryController = __decorate([
     (0, common_1.Controller)('category'),
     __metadata("design:paramtypes", [category_service_1.CategoryService])

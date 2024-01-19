@@ -18,7 +18,6 @@ export class UserService {
     private jwt: JwtService,
   ) {}
 
-  // Login User
   async login(loginDto: UserLoginDto) {
     const user = await this.repo
       .createQueryBuilder('user')
@@ -41,11 +40,9 @@ export class UserService {
     }
   }
 
-  //  Register User
   async register(createUserDto: CreateUserDto) {
     const { firstname, lastname, email, password, profilePic } = createUserDto;
 
-    /*Check if the user is already present in database, if yes, throw error */
     const checkUser = await this.repo.findOne({ where: { email } });
     if (checkUser) {
       throw new BadRequestException('Please enter different email');
@@ -57,7 +54,7 @@ export class UserService {
       user.password = password;
       user.profilePic = profilePic;
 
-      this.repo.create(user); // this will run any hooks present, such as password hashing
+      this.repo.create(user);
       await this.repo.save(user);
       delete user.password;
       return user;
@@ -69,6 +66,6 @@ export class UserService {
   }
 
   async getOneUser(id: number) {
-    return await this.repo.findOneBy({id});
+    return await this.repo.findOneBy({ id });
   }
 }

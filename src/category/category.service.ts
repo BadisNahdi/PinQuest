@@ -5,16 +5,19 @@ import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Response } from 'express';
+import { Post } from 'src/post/entities/post.entity';
+import { In } from 'typeorm';
 
 @Injectable()
 export class CategoryService {
-  constructor(@InjectRepository(Category) private readonly repo: Repository<Category>) {
-  }
+  constructor(
+    @InjectRepository(Category) private readonly repo: Repository<Category>,
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+  ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     const category = new Category();
     Object.assign(category, createCategoryDto);
-
     this.repo.create(category);
     return await this.repo.save(category);
   }
@@ -24,7 +27,7 @@ export class CategoryService {
   }
 
   async findOne(id: number) {
-    return await this.repo.findOneBy({id});
+    return await this.repo.findOneBy({ id });
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
@@ -48,9 +51,21 @@ export class CategoryService {
     try {
       await this.repo.remove(category);
       return res.status(200).json({ success: true, category: category });
-
     } catch (err) {
       throw new BadRequestException('Operation failed');
     }
+  }
+  async findPostsByCategories(categoryIds: number[]): Promise<Post[]> {
+    const categories = await this.repo.find({
+      where: { id: In(categoryIds) },
+      relations: ['posts'],
+    });
+
+    let posts = [];
+    categories.forEach((category) => {
+      posts = posts.concat(category.posts);
+    });
+
+    return posts;
   }
 }

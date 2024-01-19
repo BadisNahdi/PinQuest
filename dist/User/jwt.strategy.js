@@ -24,9 +24,11 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         super({
             ignoreExpiration: false,
             secretOrKey: 'secretStringThatNoOneCanGuess',
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([(request) => {
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([
+                (request) => {
                     return request?.cookies?.Authentication;
-                }]),
+                },
+            ]),
         });
         this.repo = repo;
     }

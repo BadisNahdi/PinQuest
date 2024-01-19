@@ -13,8 +13,8 @@ exports.Post = void 0;
 const typeorm_1 = require("typeorm");
 const category_entity_1 = require("../../category/entities/category.entity");
 const slugify_1 = require("slugify");
-const user_entity_1 = require("../../User/entities/user.entity");
-const class_transformer_1 = require("class-transformer");
+const user_entity_1 = require("../../user/entities/user.entity");
+const comment_entity_1 = require("../../comment/entities/comment.entity");
 let Post = class Post {
     slugifyPost() {
         this.slug = (0, slugify_1.default)(this.title.substr(0, 20), {
@@ -42,30 +42,26 @@ __decorate([
 ], Post.prototype, "slug", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: 3 }),
-    (0, class_transformer_1.Exclude)(),
     __metadata("design:type", Number)
 ], Post.prototype, "categoryId", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    (0, class_transformer_1.Exclude)(),
     __metadata("design:type", Number)
 ], Post.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => category_entity_1.Category, (cat) => cat.posts, { eager: true }),
-    (0, typeorm_1.JoinColumn)({
-        referencedColumnName: 'id',
-        name: 'categoryId',
-    }),
+    (0, typeorm_1.ManyToOne)(() => category_entity_1.Category, (category) => category.posts, { eager: true }),
+    (0, typeorm_1.JoinColumn)({ referencedColumnName: 'id', name: 'categoryId' }),
     __metadata("design:type", category_entity_1.Category)
 ], Post.prototype, "category", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.posts, { eager: true }),
-    (0, typeorm_1.JoinColumn)({
-        referencedColumnName: 'id',
-        name: 'userId',
-    }),
+    (0, typeorm_1.JoinColumn)({ referencedColumnName: 'id', name: 'userId' }),
     __metadata("design:type", user_entity_1.User)
 ], Post.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.post),
+    __metadata("design:type", Array)
+], Post.prototype, "comments", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)

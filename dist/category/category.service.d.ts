@@ -3,12 +3,15 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { Response } from 'express';
+import { Post } from 'src/post/entities/post.entity';
 export declare class CategoryService {
     private readonly repo;
-    constructor(repo: Repository<Category>);
+    private readonly postRepository;
+    constructor(repo: Repository<Category>, postRepository: Repository<Post>);
     create(createCategoryDto: CreateCategoryDto): Promise<Category>;
     findAll(): Promise<Category[]>;
     findOne(id: number): Promise<Category>;
     update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<Category>;
     remove(id: number, res: Response): Promise<Response<any, Record<string, any>>>;
+    findPostsByCategories(categoryIds: number[]): Promise<Post[]>;
 }

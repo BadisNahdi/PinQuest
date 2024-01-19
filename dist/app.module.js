@@ -17,6 +17,7 @@ const user_roles_models_1 = require("./models/user-roles.models");
 const user_module_1 = require("./user/user.module");
 const dotenv = require("dotenv");
 const nest_access_control_1 = require("nest-access-control");
+const comment_module_1 = require("./comment/comment.module");
 dotenv.config();
 let AppModule = class AppModule {
 };
@@ -35,10 +36,11 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
                 autoLoadEntities: true,
-                entities: ["dist/**/*.entity{.ts,.js}"],
+                entities: ['dist/**/*.entity{.ts,.js}'],
                 synchronize: true,
             }),
             nest_access_control_1.AccessControlModule.forRoles(user_roles_models_1.roles),
+            comment_module_1.CommentModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

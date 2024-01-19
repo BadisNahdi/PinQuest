@@ -1,5 +1,6 @@
 import { Category } from '../../category/entities/category.entity';
-import { User } from '../../User/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 export declare class Post {
     id: number;
     title: string;
@@ -9,6 +10,7 @@ export declare class Post {
     userId: number;
     category: Category;
     user: User;
+    comments: Comment[];
     createdOn: Date;
     modifiedOn: Date;
     mainImageUrl: string;

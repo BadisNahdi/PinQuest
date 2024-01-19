@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import {  UserService } from './user.service';
+import { UserService } from './user.service';
 import { UserLoginDto } from './dto/userLogin.dto';
 import { Request, Response } from 'express';
 import { User } from './entities/user.entity';
@@ -24,15 +24,12 @@ export class UserController {
     const { token, user } = await this.userService.login(
       loginDto as UserLoginDto,
     );
-    /*res.setHeader('Set-Cookie', token);
-    return res.send({ success: true });
-*/
 
     res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
     res.cookie('Authentication', token, {
       httpOnly: true,
       maxAge: 2 * 60 * 60 * 1000,
-    }); // max age 2 hours
+    });
 
     return res.send({ success: true, user });
   }

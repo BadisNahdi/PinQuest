@@ -7,7 +7,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
@@ -24,8 +23,6 @@ import { JwtStrategy } from './jwt.strategy';
   ],
   controllers: [UserController],
   providers: [UserService, JwtStrategy],
+  exports: [TypeOrmModule],
 })
-
-export class UserModule {
-
-}
+export class UserModule {}
