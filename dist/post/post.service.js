@@ -18,12 +18,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const post_entity_1 = require("./entities/post.entity");
 const typeorm_2 = require("typeorm");
 const category_service_1 = require("../category/category.service");
+const user_roles_models_1 = require("../models/user-roles.models");
 let PostService = class PostService {
     constructor(repo, catService) {
         this.repo = repo;
         this.catService = catService;
     }
     async create(createPostDto, user) {
+        console.log(user);
         const post = new post_entity_1.Post();
         post.userId = user.id;
         Object.assign(post, createPostDto);
@@ -84,6 +86,18 @@ let PostService = class PostService {
         const post = await this.repo.findOneBy({ id });
         await this.repo.remove(post);
         return { success: true, post };
+    }
+    async deletePost(postId, userId, userRole) {
+        const post = await this.repo.findOne({ where: { id: postId } });
+        if (!post) {
+            throw new common_1.NotFoundException('Blog post not found');
+        }
+        if (userRole === user_roles_models_1.UserRoles.Admin || post.userId === userId) {
+            await this.repo.remove(post);
+        }
+        else {
+            throw new common_1.ForbiddenException('You are not allowed to delete this post');
+        }
     }
 };
 exports.PostService = PostService;

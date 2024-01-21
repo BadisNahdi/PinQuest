@@ -12,6 +12,8 @@ dotenv.config();
 @Module({
   imports: [
     PostModule,
+    CategoryModule,
+    UserModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -19,11 +21,10 @@ dotenv.config();
       username: process.env.DB_USERNAME || 'root',
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: ['dist/**/*.entity{.js,.ts}'], 
+      autoLoadEntities: true,
+      entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),
-    CategoryModule,
-    UserModule,
     AccessControlModule.forRoles(roles),
   ],
   controllers: [AppController],

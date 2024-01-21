@@ -1,8 +1,10 @@
 import { ApplyUser } from './current-user.guard';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   Res,
@@ -53,5 +55,37 @@ export class UserController {
   authStatus(@CurrentUser() user: User) {
     console.log(!!user);
     return { status: !!user, user };
+  }
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    await this.userService.sendPasswordResetEmail(email);
+  }
+  @Get('reset-password/:token')
+  async renderResetPasswordForm(@Param('token') token: string): Promise<string> {
+    try {
+      console.log(token)
+      console.log(this.userService.check(token))
+      // Validate the token and render the password reset form
+      const isValidToken = await this.userService.validateResetToken(token);
+      if (!isValidToken) {
+        throw new BadRequestException('Invalid or expired reset token 2');
+      }
+
+      // Render your password reset form here (e.g., return HTML string or render a template)
+      return 'Render your password reset form here';
+
+    } catch (error) {
+      throw new BadRequestException('Invalid or expired reset token 3');
+    }
+  }
+
+  // POST endpoint to handle the password reset submission
+  @Post('reset-password/:token')
+  async resetPassword(@Param('token') token: string, @Body() { newPassword }: { newPassword: string }): Promise<void> {
+    try {
+      await this.userService.resetPassword(token, newPassword);
+    } catch (error) {
+      throw new BadRequestException('Failed to reset password');
+    }
   }
 }

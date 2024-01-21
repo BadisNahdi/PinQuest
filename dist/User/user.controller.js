@@ -43,6 +43,31 @@ let UserController = class UserController {
         console.log(!!user);
         return { status: !!user, user };
     }
+    async forgotPassword(email) {
+        await this.userService.sendPasswordResetEmail(email);
+    }
+    async renderResetPasswordForm(token) {
+        try {
+            console.log(token);
+            console.log(this.userService.check(token));
+            const isValidToken = await this.userService.validateResetToken(token);
+            if (!isValidToken) {
+                throw new common_1.BadRequestException('Invalid or expired reset token 2');
+            }
+            return 'Render your password reset form here';
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Invalid or expired reset token 3');
+        }
+    }
+    async resetPassword(token, { newPassword }) {
+        try {
+            await this.userService.resetPassword(token, newPassword);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to reset password');
+        }
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -76,6 +101,28 @@ __decorate([
     __metadata("design:paramtypes", [user_entity_1.User]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "authStatus", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Get)('reset-password/:token'),
+    __param(0, (0, common_1.Param)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "renderResetPasswordForm", null);
+__decorate([
+    (0, common_1.Post)('reset-password/:token'),
+    __param(0, (0, common_1.Param)('token')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "resetPassword", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [user_service_1.UserService])

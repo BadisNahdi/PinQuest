@@ -17,4 +17,5 @@ export declare class PostService {
         success: boolean;
         post: Post;
     }>;
+    deletePost(postId: number, userId: number, userRole: string): Promise<void>;
 }

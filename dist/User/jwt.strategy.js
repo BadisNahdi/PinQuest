@@ -19,6 +19,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./entities/user.entity");
 const typeorm_2 = require("typeorm");
 const common_1 = require("@nestjs/common");
+const jsonwebtoken_1 = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor(repo) {
         super({
@@ -31,15 +33,37 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         this.repo = repo;
     }
     async validate(payload, req) {
-        if (!payload) {
-            throw new common_1.UnauthorizedException();
+        try {
+            if (!payload || !payload.email) {
+                throw new common_1.UnauthorizedException('Invalid payload or missing email.');
+            }
+            const user = await this.repo.findOneBy({ email: payload.email });
+            if (!user) {
+                throw new common_1.UnauthorizedException('User not found.');
+            }
+            req.user = user;
+            console.log('User set in req.user:', req.user);
+            return req.user;
         }
-        const user = await this.repo.findOneBy({ email: payload.email });
-        if (!user) {
-            throw new common_1.UnauthorizedException();
+        catch (error) {
+            console.error('Error validating token:', error.message);
+            throw new common_1.UnauthorizedException('Invalid or expired token.');
         }
-        req.user = user;
-        return req.user;
+    }
+    generateResetToken(email) {
+        return (0, jsonwebtoken_1.sign)({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    }
+    verifyResetToken(token) {
+        try {
+            console.log('Verifying token:', token);
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+            console.log('Decoded token:', decodedToken);
+            return decodedToken;
+        }
+        catch (error) {
+            console.error('Error verifying token:', error);
+            throw new common_1.UnauthorizedException('Invalid or expired reset token');
+        }
     }
 };
 exports.JwtStrategy = JwtStrategy;

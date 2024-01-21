@@ -6,5 +6,9 @@ export declare class JwtStrategy extends JwtStrategy_base {
     private readonly repo;
     constructor(repo: Repository<User>);
     validate(payload: any, req: Request): Promise<any>;
+    generateResetToken(email: string): string;
+    verifyResetToken(token: string): {
+        email: string;
+    };
 }
 export {};

@@ -9,5 +9,6 @@ export declare class User {
     profilePic: string;
     roles: UserRoles;
     posts: Post[];
+    resetToken: string;
     hashPass(): void;
 }

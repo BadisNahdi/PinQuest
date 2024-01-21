@@ -25,6 +25,8 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             post_module_1.PostModule,
+            category_module_1.CategoryModule,
+            user_module_1.UserModule,
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
                 host: process.env.DB_HOST,
@@ -32,11 +34,10 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.DB_USERNAME || 'root',
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                entities: ['dist/**/*.entity{.js,.ts}'],
+                autoLoadEntities: true,
+                entities: ["dist/**/*.entity{.ts,.js}"],
                 synchronize: true,
             }),
-            category_module_1.CategoryModule,
-            user_module_1.UserModule,
             nest_access_control_1.AccessControlModule.forRoles(user_roles_models_1.roles),
         ],
         controllers: [app_controller_1.AppController],
