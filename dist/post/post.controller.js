@@ -71,8 +71,8 @@ let PostController = class PostController {
         const post = await this.postService.getPostByShareToken(shareToken);
         return post;
     }
-    async getPostsForUser(userId, viewerId) {
-        return this.postService.getPostsForUser(userId, viewerId);
+    async getPostsForUser(userId, req) {
+        return this.postService.getPostsForUser(userId, req.user.id);
     }
 };
 exports.PostController = PostController;
@@ -200,9 +200,9 @@ __decorate([
         possession: 'any',
     }),
     __param(0, (0, common_1.Param)('userId')),
-    __param(1, (0, common_1.Query)('viewerId')),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getPostsForUser", null);
 exports.PostController = PostController = __decorate([

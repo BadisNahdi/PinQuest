@@ -151,11 +151,11 @@ export class PostController {
   })
   async getPostsForUser(
     @Param('userId') userId: number,
-    @Query('viewerId') viewerId?: number,
+    @Req() req: Request,
   ) {
     // Ensure that the logged-in user has the permission to view posts for the specified user
     // You can add your authorization logic here
 
-    return this.postService.getPostsForUser(userId, viewerId);
+    return this.postService.getPostsForUser(userId, req.user.id);
   }
 }

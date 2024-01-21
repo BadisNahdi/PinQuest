@@ -25,5 +25,5 @@ export declare class PostController {
     }>;
     deletePost(postId: number, req: Request): Promise<void>;
     getPostByShareToken(shareToken: string): Promise<import("./entities/post.entity").Post>;
-    getPostsForUser(userId: number, viewerId?: number): Promise<import("./entities/post.entity").Post[]>;
+    getPostsForUser(userId: number, req: Request): Promise<import("./entities/post.entity").Post[]>;
 }
