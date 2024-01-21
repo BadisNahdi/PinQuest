@@ -89,7 +89,7 @@ export class UserService {
     await this.repo.delete(userId);
   }
 
-  
+  asyn
   
 
 
