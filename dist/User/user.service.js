@@ -144,6 +144,40 @@ let UserService = class UserService {
             return false;
         }
     }
+    async blockUser(userId, blockedUserId) {
+        const user = await this.repo.findOneBy({ id: userId });
+        if (!user) {
+            throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        if (userId === blockedUserId) {
+            throw new common_1.HttpException('Cannot block yourself', common_1.HttpStatus.BAD_REQUEST);
+        }
+        if (user.blockList && user.blockList.includes(blockedUserId)) {
+            throw new common_1.HttpException('User is already blocked', common_1.HttpStatus.BAD_REQUEST);
+        }
+        const blockedUser = await this.repo.findOneBy({ id: blockedUserId });
+        if (!blockedUser) {
+            throw new common_1.HttpException('Blocked user not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        user.blockList = user.blockList || [];
+        user.blockList.push(blockedUserId);
+        await this.repo.save(user);
+    }
+    async unblockUser(userId, unblockedUserId) {
+        const user = await this.repo.findOneBy({ id: userId });
+        if (!user) {
+            throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        if (!user.blockList || !user.blockList.includes(unblockedUserId)) {
+            throw new common_1.HttpException('User is not blocked', common_1.HttpStatus.BAD_REQUEST);
+        }
+        const unblockedUser = await this.repo.findOneBy({ id: userId });
+        if (!unblockedUser) {
+            throw new common_1.HttpException('Unblocked user not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        user.blockList = user.blockList.filter(id => id !== unblockedUserId);
+        await this.repo.save(user);
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([

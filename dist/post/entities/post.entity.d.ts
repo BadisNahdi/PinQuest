@@ -12,5 +12,6 @@ export declare class Post {
     createdOn: Date;
     modifiedOn: Date;
     mainImageUrl: string;
+    shareToken: string;
     slugifyPost(): void;
 }

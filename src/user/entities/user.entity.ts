@@ -37,4 +37,7 @@ export class User {
   hashPass() {
     this.password = bcryptjs.hashSync(this.password, 10);
   }
+  
+  @Column({ type: 'simple-array', nullable: true })
+  blockList: number[];
 }

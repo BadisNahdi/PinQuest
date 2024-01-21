@@ -11,4 +11,5 @@ export declare class User {
     posts: Post[];
     resetToken: string;
     hashPass(): void;
+    blockList: number[];
 }

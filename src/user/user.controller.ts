@@ -16,6 +16,8 @@ import { UserLoginDto } from './dto/userLogin.dto';
 import { Request, Response } from 'express';
 import { User } from './entities/user.entity';
 import { CurrentUser } from './user.decorator';
+import { ACGuard, UseRoles } from 'nest-access-control';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class UserController {
@@ -88,4 +90,18 @@ export class UserController {
       throw new BadRequestException('Failed to reset password');
     }
   }
+  @Post('block/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async blockUser(@Param('userId') userId: number, @Req() req: Request) {
+    console.log(req.user)
+    await this.userService.blockUser(req.user.id, userId);
+    return 'User blocked successfully';
+}
+
+  @Post('unblock/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async unblockUser(@Param('userId') userId: number, @Req() req: Request) {
+    await this.userService.unblockUser(req.user.id, userId);
+    return 'User unblocked successfully';
+}
 }

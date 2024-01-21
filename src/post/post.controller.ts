@@ -13,6 +13,7 @@ import {
   UseGuards,
   UseInterceptors,
   Res,
+  Inject,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import {User_} from '../user/userv2.decorator'
@@ -24,11 +25,13 @@ import { User } from '../User/entities/user.entity';
 import { ACGuard, UseRoles } from 'nest-access-control';
 import { FileInterceptor } from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
+import { UserService } from 'src/user/user.service';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService,
+    @Inject(UserService) private readonly userService: UserService,) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'), ACGuard)
@@ -132,5 +135,27 @@ export class PostController {
     console.log(userId,userRole,req.user)
 
     await this.postService.deletePost(postId, userId, userRole);
+  }
+  @Get('share/:shareToken')
+  async getPostByShareToken(@Param('shareToken') shareToken: string) {
+    const post = await this.postService.getPostByShareToken(shareToken);
+    return post;
+  }
+
+  @Get('user/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    resource: 'posts',
+    action: 'read',
+    possession: 'any',
+  })
+  async getPostsForUser(
+    @Param('userId') userId: number,
+    @Query('viewerId') viewerId?: number,
+  ) {
+    // Ensure that the logged-in user has the permission to view posts for the specified user
+    // You can add your authorization logic here
+
+    return this.postService.getPostsForUser(userId, viewerId);
   }
 }

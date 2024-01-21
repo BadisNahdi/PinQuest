@@ -17,4 +17,6 @@ export declare class UserController {
     resetPassword(token: string, { newPassword }: {
         newPassword: string;
     }): Promise<void>;
+    blockUser(userId: number, req: Request): Promise<string>;
+    unblockUser(userId: number, req: Request): Promise<string>;
 }

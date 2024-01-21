@@ -20,4 +20,6 @@ export declare class UserService {
     resetPassword(resetToken: string, newPassword: string): Promise<void>;
     check(token: string): Promise<any>;
     validateResetToken(token: string): Promise<boolean>;
+    blockUser(userId: number, blockedUserId: number): Promise<void>;
+    unblockUser(userId: number, unblockedUserId: number): Promise<void>;
 }

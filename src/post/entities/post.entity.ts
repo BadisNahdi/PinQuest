@@ -59,6 +59,10 @@ import {
       nullable: true,
     })
     mainImageUrl: string;
+    
+    @Column({ nullable: true })
+    shareToken: string;
+
   
     @BeforeInsert()
     slugifyPost() {

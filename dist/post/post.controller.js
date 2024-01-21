@@ -21,9 +21,11 @@ const passport_1 = require("@nestjs/passport");
 const nest_access_control_1 = require("nest-access-control");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
+const user_service_1 = require("../user/user.service");
 let PostController = class PostController {
-    constructor(postService) {
+    constructor(postService, userService) {
         this.postService = postService;
+        this.userService = userService;
     }
     create(createPostDto, req) {
         return this.postService.create(createPostDto, req.user);
@@ -64,6 +66,13 @@ let PostController = class PostController {
         const userRole = req.user.roles;
         console.log(userId, userRole, req.user);
         await this.postService.deletePost(postId, userId, userRole);
+    }
+    async getPostByShareToken(shareToken) {
+        const post = await this.postService.getPostByShareToken(shareToken);
+        return post;
+    }
+    async getPostsForUser(userId, viewerId) {
+        return this.postService.getPostsForUser(userId, viewerId);
     }
 };
 exports.PostController = PostController;
@@ -175,9 +184,32 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "deletePost", null);
+__decorate([
+    (0, common_1.Get)('share/:shareToken'),
+    __param(0, (0, common_1.Param)('shareToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getPostByShareToken", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    (0, nest_access_control_1.UseRoles)({
+        resource: 'posts',
+        action: 'read',
+        possession: 'any',
+    }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Query)('viewerId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getPostsForUser", null);
 exports.PostController = PostController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),
-    __metadata("design:paramtypes", [post_service_1.PostService])
+    __param(1, (0, common_1.Inject)(user_service_1.UserService)),
+    __metadata("design:paramtypes", [post_service_1.PostService,
+        user_service_1.UserService])
 ], PostController);
 //# sourceMappingURL=post.controller.js.map
