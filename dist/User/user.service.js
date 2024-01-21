@@ -19,8 +19,11 @@ const user_entity_1 = require("./entities/user.entity");
 const typeorm_2 = require("typeorm");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcryptjs");
+const jwt_strategy_1 = require("./jwt.strategy");
+const nodemailer = require("nodemailer");
 let UserService = class UserService {
-    constructor(repo, jwt) {
+    constructor(jwtStrategy, repo, jwt) {
+        this.jwtStrategy = jwtStrategy;
         this.repo = repo;
         this.jwt = jwt;
     }
@@ -72,12 +75,82 @@ let UserService = class UserService {
     async getOneUser(id) {
         return await this.repo.findOneBy({ id });
     }
+    async sendPasswordResetEmail(email) {
+        const user = await this.repo.findOne({ where: { email } });
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const resetToken = this.jwtStrategy.generateResetToken(email);
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.USER,
+                pass: process.env.APP_PASSWORD,
+            },
+        });
+        const resetLink = `http://127.0.0.1:5000/api/auth/reset-password?token=${resetToken}`;
+        const mailOptions = {
+            from: 'nesttest720@gmail.com',
+            to: user.email,
+            subject: 'Password Reset',
+            text: `Click the following link to reset your password: ${resetLink}`,
+        };
+        try {
+            await transporter.sendMail(mailOptions);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to send password reset email');
+        }
+    }
+    async resetPassword(resetToken, newPassword) {
+        try {
+            const decodedToken = this.jwtStrategy.verifyResetToken(resetToken);
+            if (!decodedToken || decodedToken.exp < Date.now() / 1000) {
+                throw new common_1.UnauthorizedException('Invalid or expired reset token');
+            }
+            const user = await this.repo.findOne({ where: { email: decodedToken.email } });
+            if (!user) {
+                throw new common_1.NotFoundException('User not found');
+            }
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            user.password = hashedPassword;
+            await this.repo.save(user);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to reset password');
+        }
+    }
+    async check(token) {
+        try {
+            const decodedToken = await this.jwtStrategy.verifyResetToken(token);
+            console.log(decodedToken);
+            return decodedToken;
+        }
+        catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+    async validateResetToken(token) {
+        try {
+            const decodedToken = this.jwtStrategy.verifyResetToken(token);
+            console.log(decodedToken);
+            return !!decodedToken && decodedToken.exp >= Date.now() / 1000;
+        }
+        catch (error) {
+            return false;
+        }
+    }
 };
 exports.UserService = UserService;
 exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
+    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __metadata("design:paramtypes", [jwt_strategy_1.JwtStrategy,
+        typeorm_2.Repository,
         jwt_1.JwtService])
 ], UserService);
 //# sourceMappingURL=user.service.js.map

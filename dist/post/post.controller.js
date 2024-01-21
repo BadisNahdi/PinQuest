@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostController = void 0;
 const common_1 = require("@nestjs/common");
 const post_service_1 = require("./post.service");
-const userv2_decorator_1 = require("../user/userv2.decorator");
 const create_post_dto_1 = require("./dto/create-post.dto");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const passport_1 = require("@nestjs/passport");
@@ -26,8 +25,8 @@ let PostController = class PostController {
     constructor(postService) {
         this.postService = postService;
     }
-    create(createPostDto, user) {
-        return this.postService.create(createPostDto, user);
+    create(createPostDto, req) {
+        return this.postService.create(createPostDto, req.user);
     }
     uploadPhoto(file) {
         if (!file) {
@@ -60,6 +59,12 @@ let PostController = class PostController {
     remove(id) {
         return this.postService.remove(+id);
     }
+    async deletePost(postId, req) {
+        const userId = req.user.id;
+        const userRole = req.user.roles;
+        console.log(userId, userRole, req.user);
+        await this.postService.deletePost(postId, userId, userRole);
+    }
 };
 exports.PostController = PostController;
 __decorate([
@@ -71,7 +76,7 @@ __decorate([
         possession: 'any',
     }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, userv2_decorator_1.User_)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto, Object]),
     __metadata("design:returntype", void 0)
@@ -156,6 +161,20 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], PostController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Delete)('own/:id'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    (0, nest_access_control_1.UseRoles)({
+        resource: 'posts',
+        action: 'delete',
+        possession: 'own',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "deletePost", null);
 exports.PostController = PostController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),

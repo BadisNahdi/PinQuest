@@ -12,4 +12,9 @@ export declare class UserController {
         status: boolean;
         user: User;
     };
+    forgotPassword(email: string): Promise<void>;
+    renderResetPasswordForm(token: string): Promise<string>;
+    resetPassword(token: string, { newPassword }: {
+        newPassword: string;
+    }): Promise<void>;
 }

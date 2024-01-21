@@ -30,6 +30,9 @@ export class User {
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
+  @Column({ nullable: true })
+  resetToken: string;
+  
   @BeforeInsert()
   hashPass() {
     this.password = bcryptjs.hashSync(this.password, 10);

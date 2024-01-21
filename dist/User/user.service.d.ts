@@ -3,10 +3,12 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/userLogin.dto';
+import { JwtStrategy } from './jwt.strategy';
 export declare class UserService {
+    private readonly jwtStrategy;
     private readonly repo;
     private jwt;
-    constructor(repo: Repository<User>, jwt: JwtService);
+    constructor(jwtStrategy: JwtStrategy, repo: Repository<User>, jwt: JwtService);
     login(loginDto: UserLoginDto): Promise<{
         token: string;
         user: User;
@@ -14,4 +16,8 @@ export declare class UserService {
     register(createUserDto: CreateUserDto): Promise<User>;
     verifyPassword(password: string, userHash: string): Promise<boolean>;
     getOneUser(id: number): Promise<User>;
+    sendPasswordResetEmail(email: string): Promise<void>;
+    resetPassword(resetToken: string, newPassword: string): Promise<void>;
+    check(token: string): Promise<any>;
+    validateResetToken(token: string): Promise<boolean>;
 }

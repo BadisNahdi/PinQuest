@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from '../User/entities/user.entity';
 import { CategoryService } from '../category/category.service';
+import { UserRoles } from '../models/user-roles.models'
 
 @Injectable()
 export class PostService {
@@ -15,6 +16,7 @@ export class PostService {
   ) {}
 
   async create(createPostDto: CreatePostDto, user: User) {
+    console.log(user)
     const post = new Post();
     post.userId = user.id;
     Object.assign(post, createPostDto);
@@ -88,5 +90,19 @@ export class PostService {
     const post = await this.repo.findOneBy({id});
     await this.repo.remove(post);
     return { success: true, post };
+  }
+  async deletePost(postId: number, userId: number, userRole: string): Promise<void> {
+    const post = await this.repo.findOne({ where: { id: postId } });
+
+    if (!post) {
+      throw new NotFoundException('Blog post not found');
+    }
+
+    // Check if the user has the necessary role or owns the post
+    if (userRole === UserRoles.Admin || post.userId === userId) {
+      await this.repo.remove(post);
+    } else {
+      throw new ForbiddenException('You are not allowed to delete this post');
+    }
   }
 }

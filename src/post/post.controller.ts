@@ -37,8 +37,8 @@ export class PostController {
     action: 'create',
     possession: 'any',
   })
-  create(@Body() createPostDto: CreatePostDto, @User_() user) {
-    return this.postService.create(createPostDto, user);
+  create(@Body() createPostDto: CreatePostDto, @Req() req: Request) {
+    return this.postService.create(createPostDto, req.user as User);
   }
 
   // Upload Picture to Server
@@ -118,5 +118,19 @@ export class PostController {
   })
   remove(@Param('id') id: string) {
     return this.postService.remove(+id);
+  }
+  @Delete('own/:id')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    resource: 'posts',
+    action: 'delete',
+    possession: 'own',
+  })
+  async deletePost(@Param('id') postId: number, @Req() req: Request): Promise<void> {
+    const userId = req.user.id;
+    const userRole = req.user.roles; 
+    console.log(userId,userRole,req.user)
+
+    await this.postService.deletePost(postId, userId, userRole);
   }
 }

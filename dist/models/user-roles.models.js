@@ -11,6 +11,8 @@ exports.roles = new nest_access_control_1.RolesBuilder();
 exports.roles
     .grant(UserRoles.Reader)
     .readAny(['posts'])
+    .createAny(['posts'])
+    .deleteOwn(['posts'])
     .grant(UserRoles.Admin)
     .extend(UserRoles.Reader)
     .readAny(['posts'])

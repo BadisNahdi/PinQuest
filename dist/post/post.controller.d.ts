@@ -2,10 +2,11 @@
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { Request } from 'express';
 export declare class PostController {
     private readonly postService;
     constructor(postService: PostService);
-    create(createPostDto: CreatePostDto, user: any): Promise<import("./entities/post.entity").Post>;
+    create(createPostDto: CreatePostDto, req: Request): Promise<import("./entities/post.entity").Post>;
     uploadPhoto(file: Express.Multer.File): {
         filePath: string;
     } | {
@@ -20,4 +21,5 @@ export declare class PostController {
         success: boolean;
         post: import("./entities/post.entity").Post;
     }>;
+    deletePost(postId: number, req: Request): Promise<void>;
 }
