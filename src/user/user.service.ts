@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/userLogin.dto';
 import * as bcrypt from 'bcryptjs';
+
 
 @Injectable()
 export class UserService {
@@ -71,4 +74,24 @@ export class UserService {
   async getOneUser(id: number) {
     return await this.repo.findOneBy({id});
   }
+
+  async deleteUser(userId: number) {
+    const user = await this.repo.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    // Prevent deletion of admins 
+    if (user.roles?.includes('Admin')) {
+      throw new ForbiddenException('Cannot delete admins');
+    }
+  
+    await this.repo.delete(userId);
+  }
+
+  
+  
+
+
 }
+

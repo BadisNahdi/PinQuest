@@ -2,18 +2,25 @@ import { ApplyUser } from './current-user.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpException,
+  Param,
   Post,
   Req,
   Res,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import {  UserService } from './user.service';
 import { UserLoginDto } from './dto/userLogin.dto';
-import { Request, Response } from 'express';
+import { Request, Response, request } from 'express';
 import { User } from './entities/user.entity';
 import { CurrentUser } from './user.decorator';
+import { Roles } from './user-roles.decorator';
+
 
 @Controller('auth')
 export class UserController {
@@ -54,4 +61,15 @@ export class UserController {
     console.log(!!user);
     return { status: !!user, user };
   }
+
+  @Delete('users/:id')
+  @Roles('Admin') // Only the admin can delete a user
+  async deleteUser(@Param('id') userId: number) {
+      await this.userService.deleteUser(userId);
+      return 'User deleted successfully';
+  }
+
+
+
 }
+
