@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/userLogin.dto';
 import * as bcrypt from 'bcryptjs';
+import { ProfileUpdateDto } from './dto/profile-update.dto';
 
 
 @Injectable()
@@ -88,9 +89,30 @@ export class UserService {
   
     await this.repo.delete(userId);
   }
+  async updateProfile(userId: number, updateDto: ProfileUpdateDto) {
+    const user = await this.repo.findOne({ where: { id: userId } });
 
-  asyn
-  
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update user properties
+    user.firstname = updateDto.firstname;
+    user.lastname = updateDto.lastname;
+    user.email = updateDto.email;
+
+    // Handle password change if provided
+    if (updateDto.password) {
+      const hashedPassword = await bcrypt.hash(updateDto.password, 10);
+      user.password = hashedPassword;
+    }
+
+    // Handle profile picture update
+    if (updateDto.profilePic) {
+      user.profilePic = updateDto.profilePic; // Assign directly to the entity property
+    }
+}
+
 
 
 }

@@ -20,6 +20,8 @@ import { Request, Response, request } from 'express';
 import { User } from './entities/user.entity';
 import { CurrentUser } from './user.decorator';
 import { Roles } from './user-roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { ProfileUpdateDto } from './dto/profile-update.dto';
 
 
 @Controller('auth')
@@ -69,7 +71,28 @@ export class UserController {
       return 'User deleted successfully';
   }
 
+  @Post('updateProfile')
+  @UseGuards(AuthGuard('jwt'))
+  @UsePipes(ValidationPipe)
+  async updateProfile(@Body() updateDto: ProfileUpdateDto) {
+    const user = request.user; // Retrieve authenticated user from JWT
 
+    try {
+      await this.userService.updateProfile(user.id, updateDto);
+      return user; // Return updated user object
+    } catch (error) {
+      throw new HttpException('Failed to update profile', error.status || 500);
+    }
+  }
 
+  // Example for retrieving current user's profile
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  async getProfile() {
+    const user = request.user;
+    return user;
+  }
 }
+
+
 
