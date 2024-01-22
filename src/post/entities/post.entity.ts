@@ -5,7 +5,9 @@ import {
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
+    OneToMany
   } from 'typeorm';
+  import { PostRating } from './post-rating.entity';
   import { Category } from '../../category/entities/category.entity';
   import slugify from 'slugify';
   import { User } from '../../User/entities/user.entity';
@@ -67,4 +69,17 @@ import {
         lower: true,
       });
     }
-  }
+
+    @Column()
+    averageRating: number;
+
+    @Column()
+    ratingsCount: number;
+
+    // ... relationships
+
+    @OneToMany(() => PostRating, (rating) => rating.post)
+    ratings: PostRating[];
+  
+}
+

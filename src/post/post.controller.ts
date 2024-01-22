@@ -13,6 +13,9 @@ import {
   UseGuards,
   UseInterceptors,
   Res,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import {User_} from '../user/userv2.decorator'
@@ -24,10 +27,12 @@ import { User } from '../User/entities/user.entity';
 import { ACGuard, UseRoles } from 'nest-access-control';
 import { FileInterceptor } from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
+import { PostRatingDto } from './dto/rate-post.dto';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
 export class PostController {
+  repo: any;
   constructor(private readonly postService: PostService) {}
 
   @Post()
@@ -119,4 +124,37 @@ export class PostController {
   remove(@Param('id') id: string) {
     return this.postService.remove(+id);
   }
+  @Post(':postId/rate')
+@UseGuards(AuthGuard('jwt'))
+async ratePost(@Param('postId') postId: number, @Body() ratePostDto: PostRatingDto) {
+  try {
+    const parsedPostId = Number(postId); 
+
+    await this.postService.ratePost(parsedPostId, ratePostDto.rating);
+
+    const updatedPost = await this.repo.findOne(postId);
+
+    if (!updatedPost) { 
+      throw new BadRequestException('Post not found');
+    }
+
+    return {
+      success: true,
+      message: 'Post rated successfully',
+      post: updatedPost,
+    };
+  } catch (error) {
+    // Enhanced error handling
+    if (error instanceof NotFoundException) {
+      throw new BadRequestException('Post not found');
+    } else if (error instanceof ForbiddenException) {
+      throw new ForbiddenException('You cannot rate this post');
+    } else {
+      throw new BadRequestException(error.message);
+    }
+  }
 }
+
+}
+
+

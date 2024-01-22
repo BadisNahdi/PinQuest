@@ -6,6 +6,7 @@ import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from '../User/entities/user.entity';
 import { CategoryService } from '../category/category.service';
+import { PostRating } from './entities/post-rating.entity';
 
 @Injectable()
 export class PostService {
@@ -88,5 +89,38 @@ export class PostService {
     const post = await this.repo.findOneBy({id});
     await this.repo.remove(post);
     return { success: true, post };
+  }
+
+  async ratePost(postId: number, rating: number) {
+    const postOptions = { where: { id: postId } };
+    const post = await this.repo.findOne(postOptions);
+  
+    if (!post) {
+      throw new BadRequestException('Post not found');
+    }
+  
+    if (rating < 1 || rating > 5) {
+      throw new BadRequestException('Invalid rating value');
+    }
+  
+    // Calculate new average rating and count, including existing ratings
+    const newAverageRating = (post.averageRating * post.ratingsCount + rating) / (post.ratingsCount + 1);
+    const newRatingsCount = post.ratingsCount + 1;
+  
+    // Create new rating entry
+    const postRating = new PostRating();
+    postRating.userId = 
+    postRating.postId = post.id;
+    postRating.rating = rating;
+    postRating.timestamp = new Date();
+    post.ratings.push(postRating);
+  
+    // Update post entity with new average and count
+    post.averageRating = newAverageRating;
+    post.ratingsCount = newRatingsCount;
+  
+    await this.repo.save(post);
+  
+    return { success: true, message: 'Post rated successfully' };
   }
 }
