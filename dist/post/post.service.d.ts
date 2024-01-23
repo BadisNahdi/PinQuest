@@ -7,7 +7,8 @@ import { CategoryService } from '../category/category.service';
 export declare class PostService {
     private readonly repo;
     private catService;
-    constructor(repo: Repository<Post>, catService: CategoryService);
+    private readonly userRepo;
+    constructor(repo: Repository<Post>, catService: CategoryService, userRepo: Repository<User>);
     create(createPostDto: CreatePostDto, user: User): Promise<Post>;
     findAll(query?: string): Promise<Post[]>;
     findOne(id: number): Promise<Post>;
@@ -18,4 +19,7 @@ export declare class PostService {
         post: Post;
     }>;
     searchPosts(hashtags: string[], title: string): Promise<Post[]>;
+    getPostsForUser(userId: number, viewerId?: number): Promise<Post[]>;
+    getPostByShareToken(shareToken: string): Promise<Post>;
+    private getUserBlockedUsers;
 }

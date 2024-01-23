@@ -6,8 +6,7 @@ import { Response } from 'express';
 import { Post } from 'src/post/entities/post.entity';
 export declare class CategoryService {
     private readonly repo;
-    private readonly postRepository;
-    constructor(repo: Repository<Category>, postRepository: Repository<Post>);
+    constructor(repo: Repository<Category>);
     create(createCategoryDto: CreateCategoryDto): Promise<Category>;
     findAll(): Promise<Category[]>;
     findOne(id: number): Promise<Category>;

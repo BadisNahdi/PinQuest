@@ -16,7 +16,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { User_ } from '../user/userv2.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,6 +27,7 @@ import { Roles } from 'src/user/user.roles.decorator';
 import { Post as PostEntity } from './entities/post.entity';
 import { RolesGuard } from 'src/user/user.roles.guard';
 import { CurrentUser } from 'src/user/user.decorator';
+import { Request } from 'express';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -117,7 +117,7 @@ export class PostController {
 
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRoles.Reader)
+  @Roles(UserRoles.Admin)
   remove(
     @Param('id') id: string,
   ): Promise<{ success: boolean; post: PostEntity }> {
@@ -125,5 +125,20 @@ export class PostController {
       throw new NotFoundException('Could not find the post to delete');
     }
     return this.postService.remove(+id);
+  }
+  @Get('share/:shareToken')
+  async getPostByShareToken(@Param('shareToken') shareToken: string) {
+    const post = await this.postService.getPostByShareToken(shareToken);
+    return post;
+  }
+  @Get('user/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    resource: 'posts',
+    action: 'read',
+    possession: 'any',
+  })
+  async getPostsForUser(@Param('userId') userId: number, @Req() req: Request) {
+    return this.postService.getPostsForUser(userId, req.user.id);
   }
 }

@@ -11,6 +11,7 @@ export class PostService {
   constructor(
     @InjectRepository(Post) private readonly repo: Repository<Post>,
     private catService: CategoryService,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
   async create(createPostDto: CreatePostDto, user: User) {
@@ -103,7 +104,29 @@ export class PostService {
     }
 
     return await queryBuilder.getMany();
+  }
 
-    return await queryBuilder.getMany();
+  async getPostsForUser(userId: number, viewerId?: number): Promise<Post[]> {
+    const blockedUsers = viewerId
+      ? await this.getUserBlockedUsers(viewerId)
+      : [];
+    const query = this.repo
+      .createQueryBuilder('post')
+      .where('post.userId = :userId', { userId });
+
+    if (blockedUsers.length > 0) {
+      query.andWhere('post.userId NOT IN (:...blockedUsers)', { blockedUsers });
+    }
+
+    return query.getMany();
+  }
+
+  async getPostByShareToken(shareToken: string): Promise<Post> {
+    return this.repo.findOne({ where: { shareToken } });
+  }
+
+  private async getUserBlockedUsers(userId: number): Promise<number[]> {
+    const user = await this.userRepo.findOneBy({ id: userId });
+    return user ? user.blockList || [] : [];
   }
 }

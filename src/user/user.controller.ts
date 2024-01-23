@@ -1,8 +1,10 @@
 import { ApplyUser } from './current-user.guard';
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Req,
   Res,
@@ -14,6 +16,8 @@ import { UserLoginDto } from './dto/userLogin.dto';
 import { Request, Response } from 'express';
 import { User } from './entities/user.entity';
 import { CurrentUser } from './user.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { ACGuard } from 'nest-access-control';
 
 @Controller('auth')
 export class UserController {
@@ -48,7 +52,50 @@ export class UserController {
   @Get('authstatus')
   @UseGuards(ApplyUser)
   authStatus(@CurrentUser() user: User) {
-    console.log(!!user);
     return { status: !!user, user };
+  }
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    await this.userService.sendPasswordResetEmail(email);
+  }
+  @Get('reset-password/:token')
+  async renderResetPasswordForm(
+    @Param('token') token: string,
+  ): Promise<string> {
+    try {
+      const isValidToken = await this.userService.validateResetToken(token);
+      if (!isValidToken) {
+        throw new BadRequestException('Invalid or expired reset token 2');
+      }
+
+      return 'Render your password reset form here';
+    } catch (error) {
+      throw new BadRequestException('Invalid or expired reset token 3');
+    }
+  }
+
+  @Post('reset-password/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() { newPassword }: { newPassword: string },
+  ): Promise<void> {
+    try {
+      await this.userService.resetPassword(token, newPassword);
+    } catch (error) {
+      throw new BadRequestException('Failed to reset password');
+    }
+  }
+  @Post('block/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async blockUser(@Param('userId') userId: number, @Req() req: Request) {
+    await this.userService.blockUser(req.user.id, userId);
+    return 'User blocked successfully';
+  }
+
+  @Post('unblock/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async unblockUser(@Param('userId') userId: number, @Req() req: Request) {
+    await this.userService.unblockUser(req.user.id, userId);
+    return 'User unblocked successfully';
   }
 }

@@ -19,6 +19,8 @@ const create_user_dto_1 = require("./dto/create-user.dto");
 const user_service_1 = require("./user.service");
 const user_entity_1 = require("./entities/user.entity");
 const user_decorator_1 = require("./user.decorator");
+const passport_1 = require("@nestjs/passport");
+const nest_access_control_1 = require("nest-access-control");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -40,8 +42,38 @@ let UserController = class UserController {
         return res.status(200).send({ success: true });
     }
     authStatus(user) {
-        console.log(!!user);
         return { status: !!user, user };
+    }
+    async forgotPassword(email) {
+        await this.userService.sendPasswordResetEmail(email);
+    }
+    async renderResetPasswordForm(token) {
+        try {
+            const isValidToken = await this.userService.validateResetToken(token);
+            if (!isValidToken) {
+                throw new common_1.BadRequestException('Invalid or expired reset token 2');
+            }
+            return 'Render your password reset form here';
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Invalid or expired reset token 3');
+        }
+    }
+    async resetPassword(token, { newPassword }) {
+        try {
+            await this.userService.resetPassword(token, newPassword);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to reset password');
+        }
+    }
+    async blockUser(userId, req) {
+        await this.userService.blockUser(req.user.id, userId);
+        return 'User blocked successfully';
+    }
+    async unblockUser(userId, req) {
+        await this.userService.unblockUser(req.user.id, userId);
+        return 'User unblocked successfully';
     }
 };
 exports.UserController = UserController;
@@ -76,6 +108,46 @@ __decorate([
     __metadata("design:paramtypes", [user_entity_1.User]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "authStatus", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Get)('reset-password/:token'),
+    __param(0, (0, common_1.Param)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "renderResetPasswordForm", null);
+__decorate([
+    (0, common_1.Post)('reset-password/:token'),
+    __param(0, (0, common_1.Param)('token')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Post)('block/:userId'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "blockUser", null);
+__decorate([
+    (0, common_1.Post)('unblock/:userId'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "unblockUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [user_service_1.UserService])

@@ -71,6 +71,13 @@ let PostController = class PostController {
         }
         return this.postService.remove(+id);
     }
+    async getPostByShareToken(shareToken) {
+        const post = await this.postService.getPostByShareToken(shareToken);
+        return post;
+    }
+    async getPostsForUser(userId, req) {
+        return this.postService.getPostsForUser(userId, req.user.id);
+    }
 };
 exports.PostController = PostController;
 __decorate([
@@ -160,12 +167,33 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':id'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), user_roles_guard_1.RolesGuard),
-    (0, user_roles_decorator_1.Roles)(user_roles_models_1.UserRoles.Reader),
+    (0, user_roles_decorator_1.Roles)(user_roles_models_1.UserRoles.Admin),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)('share/:shareToken'),
+    __param(0, (0, common_1.Param)('shareToken')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getPostByShareToken", null);
+__decorate([
+    (0, common_1.Get)('user/:userId'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    (0, nest_access_control_1.UseRoles)({
+        resource: 'posts',
+        action: 'read',
+        possession: 'any',
+    }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getPostsForUser", null);
 exports.PostController = PostController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),

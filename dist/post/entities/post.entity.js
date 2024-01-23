@@ -87,6 +87,10 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], Post.prototype, "slugifyPost", null);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Post.prototype, "shareToken", void 0);
 exports.Post = Post = __decorate([
     (0, typeorm_1.Entity)('posts')
 ], Post);

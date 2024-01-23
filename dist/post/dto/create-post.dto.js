@@ -27,8 +27,8 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePostDto.prototype, "content", void 0);
 __decorate([
+    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsOptional)(),
     (0, class_transformer_1.Type)(() => Number),
     __metadata("design:type", Number)
 ], CreatePostDto.prototype, "categoryId", void 0);

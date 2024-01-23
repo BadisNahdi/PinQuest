@@ -3,6 +3,7 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './entities/post.entity';
+import { Request } from 'express';
 export declare class PostController {
     private readonly postService;
     constructor(postService: PostService);
@@ -22,4 +23,6 @@ export declare class PostController {
         success: boolean;
         post: PostEntity;
     }>;
+    getPostByShareToken(shareToken: string): Promise<PostEntity>;
+    getPostsForUser(userId: number, req: Request): Promise<PostEntity[]>;
 }

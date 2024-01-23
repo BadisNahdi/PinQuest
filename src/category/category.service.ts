@@ -12,7 +12,6 @@ import { In } from 'typeorm';
 export class CategoryService {
   constructor(
     @InjectRepository(Category) private readonly repo: Repository<Category>,
-    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {

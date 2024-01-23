@@ -66,4 +66,6 @@ export class Post {
       lower: true,
     });
   }
+  @Column({ nullable: true })
+  shareToken: string;
 }

@@ -17,8 +17,8 @@ export class CreatePostDto {
   @IsNotEmpty()
   content: string;
 
+  @IsNotEmpty()
   @IsNumber()
-  @IsOptional()
   @Type(() => Number)
   categoryId: number;
 

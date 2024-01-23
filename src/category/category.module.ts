@@ -6,13 +6,9 @@ import { Category } from './entities/category.entity';
 import { PostModule } from '../post/post.module';
 
 @Module({
-  imports: [
-    forwardRef(() => PostModule),
-    TypeOrmModule.forFeature([Category]),
-  ],
+  imports: [forwardRef(() => PostModule), TypeOrmModule.forFeature([Category])],
   controllers: [CategoryController],
   providers: [CategoryService],
   exports: [CategoryService],
 })
-export class CategoryModule {
-}
+export class CategoryModule {}

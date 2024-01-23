@@ -17,11 +17,13 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const post_entity_1 = require("./entities/post.entity");
 const typeorm_2 = require("typeorm");
+const user_entity_1 = require("../User/entities/user.entity");
 const category_service_1 = require("../category/category.service");
 let PostService = class PostService {
-    constructor(repo, catService) {
+    constructor(repo, catService, userRepo) {
         this.repo = repo;
         this.catService = catService;
+        this.userRepo = userRepo;
     }
     async create(createPostDto, user) {
         const post = new post_entity_1.Post();
@@ -102,14 +104,34 @@ let PostService = class PostService {
             });
         }
         return await queryBuilder.getMany();
-        return await queryBuilder.getMany();
+    }
+    async getPostsForUser(userId, viewerId) {
+        const blockedUsers = viewerId
+            ? await this.getUserBlockedUsers(viewerId)
+            : [];
+        const query = this.repo
+            .createQueryBuilder('post')
+            .where('post.userId = :userId', { userId });
+        if (blockedUsers.length > 0) {
+            query.andWhere('post.userId NOT IN (:...blockedUsers)', { blockedUsers });
+        }
+        return query.getMany();
+    }
+    async getPostByShareToken(shareToken) {
+        return this.repo.findOne({ where: { shareToken } });
+    }
+    async getUserBlockedUsers(userId) {
+        const user = await this.userRepo.findOneBy({ id: userId });
+        return user ? user.blockList || [] : [];
     }
 };
 exports.PostService = PostService;
 exports.PostService = PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(post_entity_1.Post)),
+    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        category_service_1.CategoryService])
+        category_service_1.CategoryService,
+        typeorm_2.Repository])
 ], PostService);
 //# sourceMappingURL=post.service.js.map

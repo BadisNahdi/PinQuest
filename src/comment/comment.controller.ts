@@ -40,5 +40,5 @@ export class CommentController {
       }
       throw new BadRequestException('Invalid data');
     }
-  } 
+  }
 }

@@ -12,4 +12,6 @@ export declare class User {
     posts: Post[];
     comments: Comment[];
     hashPass(): void;
+    resetToken: string;
+    blockList: number[];
 }
