@@ -1,5 +1,6 @@
 import { ApplyUser } from './current-user.guard';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -85,13 +86,18 @@ export class UserController {
     }
   }
 
-  // Example for retrieving current user's profile
-  @Get()
+  @Post(':userId/follow')
   @UseGuards(AuthGuard('jwt'))
-  async getProfile() {
-    const user = request.user;
-    return user;
-  }
+  async followUser(@Param('userId') userIdToFollow: number, @CurrentUser() user: User) {
+    try {
+        await this.userService.followUser(user.id, userIdToFollow);
+        return { success: true, message: 'User followed successfully' };
+    } catch (error) {
+        throw new BadRequestException(error.message);
+    }
+}
+
+  
 }
 
 

@@ -13,11 +13,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/userLogin.dto';
 import * as bcrypt from 'bcryptjs';
 import { ProfileUpdateDto } from './dto/profile-update.dto';
+import { UserFollow } from './entities/user-follow.entity';
 
 
 @Injectable()
 export class UserService {
   constructor(
+    @InjectRepository(UserFollow) private userFollowRepository: Repository<UserFollow>,
     @InjectRepository(User) private readonly repo: Repository<User>,
     private jwt: JwtService,
   ) {}
@@ -113,6 +115,32 @@ export class UserService {
     }
 }
 
+
+async followUser(followerId: number, userIdToFollow: number) {
+  const follower = await this.repo.findOne({ where: { id: followerId } });
+  const userToFollow = await  this.repo.findOne({ where: { id: userIdToFollow } })
+
+  // Check for existing relationship and prevent following oneself
+  if (!userToFollow || follower.id === userToFollow.id) {
+      throw new BadRequestException('Invalid follow attempt');
+  }
+
+  const queryBuilder = await this.userFollowRepository
+  .createQueryBuilder('userFollow')
+  .where({ followedUser: { id: userIdToFollow } })
+  .leftJoinAndSelect('follower', 'follower.id = :followerId', 'followerId'); // Pass 'followerId' as a string
+
+  const existingFollow = await queryBuilder.getOne();
+    
+    if (!existingFollow) {
+      const userFollow = new UserFollow();
+      userFollow.follower = follower;
+      userFollow.followedUser = userToFollow;
+      await this.userFollowRepository.save(userFollow);
+    }
+
+
+}
 
 
 }
