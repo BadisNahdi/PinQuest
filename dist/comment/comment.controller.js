@@ -32,6 +32,9 @@ let CommentController = class CommentController {
             throw new common_1.BadRequestException('Invalid data');
         }
     }
+    async getCommentsByPost(postId) {
+        return await this.commentService.getCommentsByPost(postId);
+    }
     async update(id, updateCommentDto) {
         try {
             return await this.commentService.update(id, updateCommentDto);
@@ -52,6 +55,13 @@ __decorate([
     __metadata("design:paramtypes", [create_comment_dto_1.CreateCommentDto]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)('/:postId'),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], CommentController.prototype, "getCommentsByPost", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

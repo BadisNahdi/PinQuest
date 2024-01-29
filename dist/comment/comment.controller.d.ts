@@ -5,5 +5,6 @@ export declare class CommentController {
     private readonly commentService;
     constructor(commentService: CommentService);
     create(createCommentDto: CreateCommentDto): Promise<import("./entities/comment.entity").Comment>;
+    getCommentsByPost(postId: number): Promise<import("./entities/comment.entity").Comment[]>;
     update(id: number, updateCommentDto: UpdateCommentDto): Promise<import("./entities/comment.entity").Comment>;
 }

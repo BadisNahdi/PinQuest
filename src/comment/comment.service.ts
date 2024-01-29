@@ -59,4 +59,14 @@ export class CommentService {
     comment.content = updateCommentDto.content;
     return await this.commentRepository.save(comment);
   }
+
+  async getCommentsByPost(postId: number) {
+    return await this.commentRepository.find({
+      where: {
+        post: {
+          id: postId,
+        },
+      },
+    });
+  }
 }

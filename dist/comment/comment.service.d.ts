@@ -11,4 +11,5 @@ export declare class CommentService {
     constructor(commentRepository: Repository<Comment>, userRepository: Repository<User>, postRepository: Repository<Post>);
     create(createCommentDto: CreateCommentDto): Promise<Comment>;
     update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment>;
+    getCommentsByPost(postId: number): Promise<Comment[]>;
 }

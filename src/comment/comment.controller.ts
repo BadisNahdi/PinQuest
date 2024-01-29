@@ -6,6 +6,7 @@ import {
   Body,
   NotFoundException,
   BadRequestException,
+  Get,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -25,6 +26,11 @@ export class CommentController {
       }
       throw new BadRequestException('Invalid data');
     }
+  }
+
+  @Get('/:postId')
+  async getCommentsByPost(@Param() postId: number) {
+    return await this.commentService.getCommentsByPost(postId);
   }
 
   @Patch(':id')

@@ -55,6 +55,15 @@ let CommentService = class CommentService {
         comment.content = updateCommentDto.content;
         return await this.commentRepository.save(comment);
     }
+    async getCommentsByPost(postId) {
+        return await this.commentRepository.find({
+            where: {
+                post: {
+                    id: postId,
+                },
+            },
+        });
+    }
 };
 exports.CommentService = CommentService;
 exports.CommentService = CommentService = __decorate([
