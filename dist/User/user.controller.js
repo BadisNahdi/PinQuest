@@ -26,13 +26,20 @@ let UserController = class UserController {
         this.userService = userService;
     }
     async loginUser(loginDto, res) {
-        const { token, user } = await this.userService.login(loginDto);
-        res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
-        res.cookie('Authentication', token, {
-            httpOnly: true,
-            maxAge: 2 * 60 * 60 * 1000,
-        });
-        return res.send({ success: true, user });
+        try {
+            const { token, user } = await this.userService.login(loginDto);
+            res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
+            res.cookie('Authentication', token, {
+                httpOnly: true,
+                maxAge: 2 * 60 * 60 * 1000,
+            });
+            return res.send({ success: true, user, token });
+        }
+        catch (error) {
+            return res
+                .status(500)
+                .send({ success: false, error: 'Internal Server Error' });
+        }
     }
     registerUser(body) {
         return this.userService.register(body);
@@ -79,6 +86,7 @@ let UserController = class UserController {
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Post)('login'),
+    (0, common_1.HttpCode)(200),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),

@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Param,
   Post,
   Req,
@@ -24,18 +25,28 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('login')
+  @HttpCode(200) // Specify the desired status code
   async loginUser(@Body() loginDto: any, @Res() res: Response) {
-    const { token, user } = await this.userService.login(
-      loginDto as UserLoginDto,
-    );
+    try {
+      const { token, user } = await this.userService.login(
+        loginDto as UserLoginDto,
+      );
 
-    res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
-    res.cookie('Authentication', token, {
-      httpOnly: true,
-      maxAge: 2 * 60 * 60 * 1000,
-    });
+      // Set cookies
+      res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
+      res.cookie('Authentication', token, {
+        httpOnly: true,
+        maxAge: 2 * 60 * 60 * 1000,
+      });
 
-    return res.send({ success: true, user });
+      // Send response with 200 status
+      return res.send({ success: true, user, token });
+    } catch (error) {
+      // Handle errors, possibly return a different status code
+      return res
+        .status(500)
+        .send({ success: false, error: 'Internal Server Error' });
+    }
   }
 
   @Post('register')
