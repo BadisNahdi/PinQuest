@@ -9,7 +9,7 @@ export declare class CommentService {
     private readonly userRepository;
     private readonly postRepository;
     constructor(commentRepository: Repository<Comment>, userRepository: Repository<User>, postRepository: Repository<Post>);
-    create(createCommentDto: CreateCommentDto): Promise<Comment>;
+    create(createCommentDto: CreateCommentDto, userId: number): Promise<Comment>;
     update(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment>;
     getCommentsByPost(postId: number): Promise<Comment[]>;
 }

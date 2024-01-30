@@ -29,7 +29,7 @@ __decorate([
     __metadata("design:type", post_entity_1.Post)
 ], Comment.prototype, "post", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.comments),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.comments, { eager: true }),
     __metadata("design:type", user_entity_1.User)
 ], Comment.prototype, "user", void 0);
 exports.Comment = Comment = __decorate([

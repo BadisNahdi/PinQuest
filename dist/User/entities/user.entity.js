@@ -42,7 +42,7 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: null }),
+    (0, typeorm_1.Column)({ default: "https://repertoire-artistestunisiens.com/wp-content/uploads/2016/09/samir-loussif-300x300.jpg" }),
     __metadata("design:type", String)
 ], User.prototype, "profilePic", void 0);
 __decorate([

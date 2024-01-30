@@ -18,15 +18,15 @@ export class CommentService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto): Promise<Comment> {
+  async create(createCommentDto: CreateCommentDto, userId:number): Promise<Comment> {
     const user = await this.userRepository.findOneBy({
-      id: createCommentDto.userId,
+      id: userId,
     });
-    if (!user) {
-      throw new NotFoundException(
-        `User with ID ${createCommentDto.userId} not found`,
-      );
-    }
+    // if (!user) {
+    //   throw new NotFoundException(
+    //     `User with ID ${createCommentDto.userId} not found`,
+    //   );
+    // }
 
     const post = await this.postRepository.findOneBy({
       id: createCommentDto.postId,

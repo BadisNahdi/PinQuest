@@ -25,13 +25,10 @@ let CommentService = class CommentService {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
     }
-    async create(createCommentDto) {
+    async create(createCommentDto, userId) {
         const user = await this.userRepository.findOneBy({
-            id: createCommentDto.userId,
+            id: userId,
         });
-        if (!user) {
-            throw new common_1.NotFoundException(`User with ID ${createCommentDto.userId} not found`);
-        }
         const post = await this.postRepository.findOneBy({
             id: createCommentDto.postId,
         });

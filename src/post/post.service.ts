@@ -54,8 +54,9 @@ export class PostService {
     let blockedUsers = await this.getUserBlockedUsers(userId);
     // console.log('blocked', blockedUsers);
     blockedUsers = blockedUsers.map(Number);
-    const filteredPosts = allPosts.filter((post) => 
-      !blockedUsers.includes(post.user.id));
+    const filteredPosts = allPosts.filter(
+      (post) => !blockedUsers.includes(post.user.id),
+    );
     // console.log(filteredPosts);
     return filteredPosts;
   }

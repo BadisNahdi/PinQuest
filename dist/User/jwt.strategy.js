@@ -20,15 +20,12 @@ const user_entity_1 = require("./entities/user.entity");
 const typeorm_2 = require("typeorm");
 const common_1 = require("@nestjs/common");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const jwt = require("jsonwebtoken");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor(repo) {
         super({
             ignoreExpiration: false,
             secretOrKey: 'secretStringThatNoOneCanGuess',
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([(request) => {
-                    return request?.cookies?.Authentication;
-                }]),
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
         });
         this.repo = repo;
     }
@@ -56,7 +53,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
     verifyResetToken(token) {
         try {
             console.log('Verifying token:', token);
-            const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+            const decodedToken = (0, jsonwebtoken_1.verify)(token, process.env.JWT_SECRET);
             console.log('Decoded token:', decodedToken);
             return decodedToken;
         }

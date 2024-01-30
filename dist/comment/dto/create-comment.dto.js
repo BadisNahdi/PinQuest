@@ -16,10 +16,6 @@ class CreateCommentDto {
 exports.CreateCommentDto = CreateCommentDto;
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Number)
-], CreateCommentDto.prototype, "userId", void 0);
-__decorate([
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateCommentDto.prototype, "content", void 0);

@@ -27,7 +27,7 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @Column({ default: null })
+  @Column({ default: "https://repertoire-artistestunisiens.com/wp-content/uploads/2016/09/samir-loussif-300x300.jpg" })
   profilePic: string;
 
   @Column({

@@ -17,18 +17,21 @@ const common_1 = require("@nestjs/common");
 const comment_service_1 = require("./comment.service");
 const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
+const passport_1 = require("@nestjs/passport");
+const nest_access_control_1 = require("nest-access-control");
 let CommentController = class CommentController {
     constructor(commentService) {
         this.commentService = commentService;
     }
-    async create(createCommentDto) {
+    async create(req, createCommentDto) {
         try {
-            return await this.commentService.create(createCommentDto);
+            return await this.commentService.create(createCommentDto, req.user.id);
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException) {
                 throw new common_1.NotFoundException(error.message);
             }
+            console.log(req.user);
             throw new common_1.BadRequestException('Invalid data');
         }
     }
@@ -50,9 +53,11 @@ let CommentController = class CommentController {
 exports.CommentController = CommentController;
 __decorate([
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_comment_dto_1.CreateCommentDto]),
+    __metadata("design:paramtypes", [Object, create_comment_dto_1.CreateCommentDto]),
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "create", null);
 __decorate([

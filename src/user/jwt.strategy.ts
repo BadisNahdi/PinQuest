@@ -6,16 +6,13 @@ import { Repository } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 import { sign, verify } from 'jsonwebtoken';
-import * as jwt from 'jsonwebtoken'
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(@InjectRepository(User) private readonly repo: Repository<User>) {
     super({
       ignoreExpiration: false,
       secretOrKey: 'secretStringThatNoOneCanGuess',
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-        return request?.cookies?.Authentication;
-      }]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
 
@@ -42,12 +39,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   generateResetToken(email: string): string {
-    return sign({ email },process.env.JWT_SECRET, { expiresIn: '1h' });
+    return sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
   }
+
   verifyResetToken(token: string): { email: string } {
     try {
       console.log('Verifying token:', token);
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as { email: string };
+      const decodedToken = verify(token, process.env.JWT_SECRET) as { email: string };
       console.log('Decoded token:', decodedToken);
       return decodedToken;
     } catch (error) {
