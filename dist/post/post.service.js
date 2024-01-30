@@ -54,6 +54,13 @@ let PostService = class PostService {
             return await myQuery.getMany();
         }
     }
+    async findWithBlocked(userId, query) {
+        const allPosts = await this.findAll(query);
+        let blockedUsers = await this.getUserBlockedUsers(userId);
+        blockedUsers = blockedUsers.map(Number);
+        const filteredPosts = allPosts.filter((post) => !blockedUsers.includes(post.user.id));
+        return filteredPosts;
+    }
     async findOne(id) {
         try {
             const post = await this.repo.findOneOrFail({ where: { id: id } });

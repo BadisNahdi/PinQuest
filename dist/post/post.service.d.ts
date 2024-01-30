@@ -11,6 +11,7 @@ export declare class PostService {
     constructor(repo: Repository<Post>, catService: CategoryService, userRepo: Repository<User>);
     create(createPostDto: CreatePostDto, user: User): Promise<Post>;
     findAll(query?: string): Promise<Post[]>;
+    findWithBlocked(userId?: number, query?: string): Promise<Post[]>;
     findOne(id: number): Promise<Post>;
     findBySlug(slug: string): Promise<Post>;
     update(slug: string, updatePostDto: UpdatePostDto): Promise<Post>;

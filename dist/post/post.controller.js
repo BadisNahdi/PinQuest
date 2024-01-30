@@ -53,8 +53,12 @@ let PostController = class PostController {
     async serveAvatar(fileId, res) {
         res.sendFile(fileId, { root: './uploads' });
     }
-    findAll(query) {
-        return this.postService.findAll(query);
+    async findAll(req, query) {
+        if (req.user == undefined) {
+            console.log(req.user);
+            return this.postService.findAll(query);
+        }
+        return this.postService.findWithBlocked(req.user.id, query);
     }
     findOne(id) {
         return this.postService.findOne(+id);
@@ -131,10 +135,12 @@ __decorate([
 ], PostController.prototype, "serveAvatar", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)()),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
 ], PostController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),

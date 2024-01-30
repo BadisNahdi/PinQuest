@@ -90,8 +90,13 @@ export class PostController {
   }
 
   @Get()
-  findAll(@Query() query: any) {
-    return this.postService.findAll(query);
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async findAll(@Req() req: Request, @Query() query: any) {
+    if (req.user == undefined) {
+      console.log(req.user);
+      return this.postService.findAll(query);
+    }
+    return this.postService.findWithBlocked(req.user.id, query);
   }
 
   @Get(':id')

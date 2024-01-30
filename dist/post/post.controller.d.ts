@@ -15,7 +15,7 @@ export declare class PostController {
         error: string;
     };
     serveAvatar(fileId: any, res: any): Promise<any>;
-    findAll(query: any): Promise<PostEntity[]>;
+    findAll(req: Request, query: any): Promise<PostEntity[]>;
     findOne(id: string): Promise<PostEntity>;
     findBySlug(slug: string): Promise<PostEntity>;
     update(slug: string, updatePostDto: UpdatePostDto): Promise<PostEntity>;
