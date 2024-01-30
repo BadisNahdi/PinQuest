@@ -15,7 +15,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
-import { ACGuard } from 'nest-access-control';
+import { ACGuard, UseRoles } from 'nest-access-control';
 
 @Controller('comments')
 export class CommentController {
@@ -38,11 +38,18 @@ export class CommentController {
   }
 
   @Get('/:postId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
   async getCommentsByPost(@Param() postId: number) {
     return await this.commentService.getCommentsByPost(postId);
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  @UseRoles({
+    resource: 'comments',
+    action: 'update',
+    possession: 'any',
+  })
   async update(
     @Param('id') id: number,
     @Body() updateCommentDto: UpdateCommentDto,

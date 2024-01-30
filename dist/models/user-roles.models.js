@@ -15,6 +15,7 @@ exports.roles
     .deleteOwn(['posts'])
     .grant(UserRoles.Admin)
     .extend(UserRoles.Reader)
+    .updateAny(['comments'])
     .readAny(['posts'])
     .updateAny(['posts'])
     .createAny(['posts'])

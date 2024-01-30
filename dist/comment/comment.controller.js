@@ -62,6 +62,7 @@ __decorate([
 ], CommentController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)('/:postId'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -69,6 +70,12 @@ __decorate([
 ], CommentController.prototype, "getCommentsByPost", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
+    (0, nest_access_control_1.UseRoles)({
+        resource: 'comments',
+        action: 'update',
+        possession: 'any',
+    }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
