@@ -17,11 +17,11 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { ACGuard, UseRoles } from 'nest-access-control';
 
+@UseGuards(AuthGuard('jwt'), ACGuard)
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService) { }
   @Post()
-  @UseGuards(AuthGuard('jwt'), ACGuard)
   async create(
     @Req() req: Request,
     @Body() createCommentDto: CreateCommentDto,
@@ -38,13 +38,12 @@ export class CommentController {
   }
 
   @Get('/:postId')
-  @UseGuards(AuthGuard('jwt'), ACGuard)
   async getCommentsByPost(@Param() postId: number) {
+    console.log("We Are Here");
     return await this.commentService.getCommentsByPost(postId);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'), ACGuard)
   @UseRoles({
     resource: 'comments',
     action: 'update',

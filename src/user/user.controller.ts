@@ -5,6 +5,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpException,
   Param,
   Post,
   Req,
@@ -22,7 +23,7 @@ import { ACGuard } from 'nest-access-control';
 
 @Controller('auth')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @Post('login')
   @HttpCode(200) // Specify the desired status code
@@ -41,11 +42,9 @@ export class UserController {
 
       // Send response with 200 status
       return res.send({ success: true, user, token });
-    } catch (error) {
+    } catch (UnauthorizedException) {
       // Handle errors, possibly return a different status code
-      return res
-        .status(500)
-        .send({ success: false, error: 'Internal Server Error' });
+      throw new HttpException("bad creds", 400);
     }
   }
 

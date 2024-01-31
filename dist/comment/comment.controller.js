@@ -36,6 +36,7 @@ let CommentController = class CommentController {
         }
     }
     async getCommentsByPost(postId) {
+        console.log("We Are Here");
         return await this.commentService.getCommentsByPost(postId);
     }
     async update(id, updateCommentDto) {
@@ -53,7 +54,6 @@ let CommentController = class CommentController {
 exports.CommentController = CommentController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -62,7 +62,6 @@ __decorate([
 ], CommentController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)('/:postId'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -70,7 +69,6 @@ __decorate([
 ], CommentController.prototype, "getCommentsByPost", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
     (0, nest_access_control_1.UseRoles)({
         resource: 'comments',
         action: 'update',
@@ -83,6 +81,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CommentController.prototype, "update", null);
 exports.CommentController = CommentController = __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
     (0, common_1.Controller)('comments'),
     __metadata("design:paramtypes", [comment_service_1.CommentService])
 ], CommentController);

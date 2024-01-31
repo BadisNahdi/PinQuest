@@ -35,10 +35,8 @@ let UserController = class UserController {
             });
             return res.send({ success: true, user, token });
         }
-        catch (error) {
-            return res
-                .status(500)
-                .send({ success: false, error: 'Internal Server Error' });
+        catch (UnauthorizedException) {
+            throw new common_1.HttpException("bad creds", 400);
         }
     }
     registerUser(body) {
