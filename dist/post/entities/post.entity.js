@@ -15,7 +15,8 @@ const category_entity_1 = require("../../category/entities/category.entity");
 const slugify_1 = require("slugify");
 const user_entity_1 = require("../../user/entities/user.entity");
 const comment_entity_1 = require("../../comment/entities/comment.entity");
-let Post = class Post {
+const timestamp_entities_1 = require("../../Generics/timestamp.entities");
+let Post = class Post extends timestamp_entities_1.TimestampEntities {
     slugifyPost() {
         this.slug = (0, slugify_1.default)(this.title.substr(0, 20), {
             replacement: '_',
@@ -66,14 +67,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => comment_entity_1.Comment, (comment) => comment.post),
     __metadata("design:type", Array)
 ], Post.prototype, "comments", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
-    __metadata("design:type", Date)
-], Post.prototype, "createdOn", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
-    __metadata("design:type", Date)
-], Post.prototype, "modifiedOn", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         default: 'https://i0.wp.com/clicxy.com/wp-content/uploads/2016/04/dummy-post-horisontal.jpg?ssl=1',

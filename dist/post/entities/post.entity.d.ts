@@ -1,7 +1,8 @@
 import { Category } from '../../category/entities/category.entity';
 import { User } from '../../user/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
-export declare class Post {
+import { TimestampEntities } from 'src/Generics/timestamp.entities';
+export declare class Post extends TimestampEntities {
     id: number;
     title: string;
     content: string;
@@ -12,8 +13,6 @@ export declare class Post {
     category: Category;
     user: User;
     comments: Comment[];
-    createdOn: Date;
-    modifiedOn: Date;
     mainImageUrl: string;
     slugifyPost(): void;
     shareToken: string;

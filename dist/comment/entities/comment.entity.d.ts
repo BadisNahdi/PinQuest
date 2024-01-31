@@ -1,6 +1,7 @@
 import { User } from '../../user/entities/user.entity';
 import { Post } from '../../post/entities/post.entity';
-export declare class Comment {
+import { TimestampEntities } from 'src/Generics/timestamp.entities';
+export declare class Comment extends TimestampEntities {
     id: number;
     content: string;
     post: Post;

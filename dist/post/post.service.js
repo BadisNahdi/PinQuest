@@ -43,7 +43,7 @@ let PostService = class PostService {
                 myQuery.where('post.slug LIKE :slug', { slug: `%${query['slug']}%` });
             }
             if (queryKeys.includes('sort')) {
-                myQuery.orderBy('post.title', query['sort'].toUpperCase());
+                myQuery.orderBy('post.updatedAt', 'DESC');
             }
             if (queryKeys.includes('category')) {
                 myQuery.andWhere('category.title = :cat', { cat: query['category'] });
@@ -84,7 +84,6 @@ let PostService = class PostService {
         if (!post) {
             throw new common_1.BadRequestException('post not found');
         }
-        post.modifiedOn = new Date(Date.now());
         post.category = updatePostDto.category;
         Object.assign(post, updatePostDto);
         return this.repo.save(post);

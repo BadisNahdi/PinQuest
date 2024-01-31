@@ -11,9 +11,10 @@ import { Category } from '../../category/entities/category.entity';
 import slugify from 'slugify';
 import { User } from '../../user/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
+import { TimestampEntities } from 'src/Generics/timestamp.entities';
 
 @Entity('posts')
-export class Post {
+export class Post extends TimestampEntities {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -45,12 +46,6 @@ export class Post {
 
   @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  createdOn: Date;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  modifiedOn: Date;
 
   @Column({
     default:

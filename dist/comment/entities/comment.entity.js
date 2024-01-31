@@ -13,7 +13,8 @@ exports.Comment = void 0;
 const typeorm_1 = require("typeorm");
 const user_entity_1 = require("../../user/entities/user.entity");
 const post_entity_1 = require("../../post/entities/post.entity");
-let Comment = class Comment {
+const timestamp_entities_1 = require("../../Generics/timestamp.entities");
+let Comment = class Comment extends timestamp_entities_1.TimestampEntities {
 };
 exports.Comment = Comment;
 __decorate([

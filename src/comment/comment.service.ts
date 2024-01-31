@@ -16,9 +16,9 @@ export class CommentService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
-  ) {}
+  ) { }
 
-  async create(createCommentDto: CreateCommentDto, userId:number): Promise<Comment> {
+  async create(createCommentDto: CreateCommentDto, userId: number): Promise<Comment> {
     const user = await this.userRepository.findOneBy({
       id: userId,
     });
@@ -66,6 +66,9 @@ export class CommentService {
         post: {
           id: postId,
         },
+      },
+      order: {
+        createdAt: 'DESC',
       },
     });
   }

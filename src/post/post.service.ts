@@ -12,7 +12,7 @@ export class PostService {
     @InjectRepository(Post) private readonly repo: Repository<Post>,
     private catService: CategoryService,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createPostDto: CreatePostDto, user: User) {
     const post = new Post();
@@ -35,7 +35,8 @@ export class PostService {
         myQuery.where('post.slug LIKE :slug', { slug: `%${query['slug']}%` });
       }
       if (queryKeys.includes('sort')) {
-        myQuery.orderBy('post.title', query['sort'].toUpperCase());
+        myQuery.orderBy('post.updatedAt', 'DESC');
+        //myQuery.orderBy('post.title', query['sort'].toUpperCase());
       }
 
       if (queryKeys.includes('category')) {
@@ -85,7 +86,6 @@ export class PostService {
       throw new BadRequestException('post not found');
     }
 
-    post.modifiedOn = new Date(Date.now());
     post.category = updatePostDto.category;
     Object.assign(post, updatePostDto);
     return this.repo.save(post);
