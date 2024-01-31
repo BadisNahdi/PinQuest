@@ -59,6 +59,9 @@ let CommentService = class CommentService {
                     id: postId,
                 },
             },
+            order: {
+                createdAt: 'DESC',
+            },
         });
     }
 };
