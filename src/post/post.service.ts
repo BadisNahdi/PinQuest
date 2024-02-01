@@ -36,7 +36,6 @@ export class PostService {
       }
       if (queryKeys.includes('sort')) {
         myQuery.orderBy('post.updatedAt', 'DESC');
-        //myQuery.orderBy('post.title', query['sort'].toUpperCase());
       }
 
       if (queryKeys.includes('category')) {
