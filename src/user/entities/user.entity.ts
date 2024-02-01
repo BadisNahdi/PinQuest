@@ -63,5 +63,4 @@ export class User {
   bio: string;
   @Column({ nullable: true })
   birthday: Date;
-  
 }
