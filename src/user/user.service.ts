@@ -13,7 +13,6 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/userLogin.dto';
 import * as bcrypt from 'bcryptjs';
-import { promises } from 'dns';
 import { JwtStrategy } from './jwt.strategy';
 import * as nodemailer from 'nodemailer';
 
@@ -209,7 +208,6 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     return user;
   }
 }

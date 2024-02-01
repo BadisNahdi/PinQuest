@@ -24,7 +24,7 @@ import { ACGuard } from 'nest-access-control';
 
 @Controller('auth')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @Post('login')
   @HttpCode(200) // Specify the desired status code
@@ -45,7 +45,7 @@ export class UserController {
       return res.send({ success: true, user, token });
     } catch (UnauthorizedException) {
       // Handle errors, possibly return a different status code
-      throw new HttpException("bad creds", 400);
+      throw new HttpException('bad creds', 400);
     }
   }
 
@@ -97,17 +97,18 @@ export class UserController {
     }
   }
 
-  @Get('profile/:userId')
+  @Get('profile/:userId?')
   @UseGuards(AuthGuard('jwt'), ACGuard)
-  async getUserProfile(@Param('userId') userId: number, @Req() req: Request) {
+  async getUserProfile(@Param('userId') userId: number, @CurrentUser() user) {
     try {
-      const user = await this.userService.getUserProfile(userId);
-      return user;
-    }
-    catch (NotFoundException) {
+      if (userId == undefined) {
+        return user;
+      }
+      const user1 = await this.userService.getUserProfile(userId);
+      return user1;
+    } catch (NotFoundException) {
       throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
     }
-
   }
 
   @Post('block/:userId')
