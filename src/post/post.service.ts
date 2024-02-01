@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,30 +6,21 @@ import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from '../User/entities/user.entity';
 import { CategoryService } from '../category/category.service';
-import { UserRoles } from '../models/user-roles.models'
-import * as shortid from 'shortid';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post) private readonly repo: Repository<Post>,
     private catService: CategoryService,
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
   async create(createPostDto: CreatePostDto, user: User) {
-    console.log(user)
     const post = new Post();
     post.userId = user.id;
-    post.shareToken = shortid.generate();
     Object.assign(post, createPostDto);
 
     this.repo.create(post);
     return await this.repo.save(post);
-  }
-
-  async getPostByShareToken(shareToken: string): Promise<Post> {
-    return this.repo.findOne({ where: { shareToken } });
   }
 
   async findAll(query?: string) {
@@ -97,36 +88,5 @@ export class PostService {
     const post = await this.repo.findOneBy({id});
     await this.repo.remove(post);
     return { success: true, post };
-  }
-  async deletePost(postId: number, userId: number, userRole: string): Promise<void> {
-    const post = await this.repo.findOne({ where: { id: postId } });
-
-    if (!post) {
-      throw new NotFoundException('Blog post not found');
-    }
-
-    // Check if the user has the necessary role or owns the post
-    if (userRole === UserRoles.Admin || post.userId === userId) {
-      await this.repo.remove(post);
-    } else {
-      throw new ForbiddenException('You are not allowed to delete this post');
-    }
-  }
-  async getPostsForUser(userId: number, viewerId?: number): Promise<Post[]> {
-    const blockedUsers = viewerId ? await this.getUserBlockedUsers(viewerId) : [];
-    const query = this.repo
-      .createQueryBuilder('post')
-      .where('post.userId = :userId', { userId });
-
-    if (blockedUsers.length > 0) {
-      query.andWhere('post.userId NOT IN (:...blockedUsers)', { blockedUsers });
-    }
-
-    return query.getMany();
-  }
-
-  private async getUserBlockedUsers(userId: number): Promise<number[]> {
-    const user = await this.userRepo.findOneBy({id:userId});
-    return user ? user.blockList || [] : [];
   }
 }

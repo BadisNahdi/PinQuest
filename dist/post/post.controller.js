@@ -15,20 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostController = void 0;
 const common_1 = require("@nestjs/common");
 const post_service_1 = require("./post.service");
+const userv2_decorator_1 = require("../user/userv2.decorator");
 const create_post_dto_1 = require("./dto/create-post.dto");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const passport_1 = require("@nestjs/passport");
 const nest_access_control_1 = require("nest-access-control");
 const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
-const user_service_1 = require("../user/user.service");
 let PostController = class PostController {
-    constructor(postService, userService) {
+    constructor(postService) {
         this.postService = postService;
-        this.userService = userService;
     }
-    create(createPostDto, req) {
-        return this.postService.create(createPostDto, req.user);
+    create(createPostDto, user) {
+        return this.postService.create(createPostDto, user);
     }
     uploadPhoto(file) {
         if (!file) {
@@ -61,19 +60,6 @@ let PostController = class PostController {
     remove(id) {
         return this.postService.remove(+id);
     }
-    async deletePost(postId, req) {
-        const userId = req.user.id;
-        const userRole = req.user.roles;
-        console.log(userId, userRole, req.user);
-        await this.postService.deletePost(postId, userId, userRole);
-    }
-    async getPostByShareToken(shareToken) {
-        const post = await this.postService.getPostByShareToken(shareToken);
-        return post;
-    }
-    async getPostsForUser(userId, req) {
-        return this.postService.getPostsForUser(userId, req.user.id);
-    }
 };
 exports.PostController = PostController;
 __decorate([
@@ -85,7 +71,7 @@ __decorate([
         possession: 'any',
     }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Req)()),
+    __param(1, (0, userv2_decorator_1.User_)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto, Object]),
     __metadata("design:returntype", void 0)
@@ -170,46 +156,9 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], PostController.prototype, "remove", null);
-__decorate([
-    (0, common_1.Delete)('own/:id'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
-    (0, nest_access_control_1.UseRoles)({
-        resource: 'posts',
-        action: 'delete',
-        possession: 'own',
-    }),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], PostController.prototype, "deletePost", null);
-__decorate([
-    (0, common_1.Get)('share/:shareToken'),
-    __param(0, (0, common_1.Param)('shareToken')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], PostController.prototype, "getPostByShareToken", null);
-__decorate([
-    (0, common_1.Get)('user/:userId'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), nest_access_control_1.ACGuard),
-    (0, nest_access_control_1.UseRoles)({
-        resource: 'posts',
-        action: 'read',
-        possession: 'any',
-    }),
-    __param(0, (0, common_1.Param)('userId')),
-    __param(1, (0, common_1.Req)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], PostController.prototype, "getPostsForUser", null);
 exports.PostController = PostController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),
-    __param(1, (0, common_1.Inject)(user_service_1.UserService)),
-    __metadata("design:paramtypes", [post_service_1.PostService,
-        user_service_1.UserService])
+    __metadata("design:paramtypes", [post_service_1.PostService])
 ], PostController);
 //# sourceMappingURL=post.controller.js.map

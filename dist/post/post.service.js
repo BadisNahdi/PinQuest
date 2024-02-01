@@ -17,27 +17,18 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const post_entity_1 = require("./entities/post.entity");
 const typeorm_2 = require("typeorm");
-const user_entity_1 = require("../User/entities/user.entity");
 const category_service_1 = require("../category/category.service");
-const user_roles_models_1 = require("../models/user-roles.models");
-const shortid = require("shortid");
 let PostService = class PostService {
-    constructor(repo, catService, userRepo) {
+    constructor(repo, catService) {
         this.repo = repo;
         this.catService = catService;
-        this.userRepo = userRepo;
     }
     async create(createPostDto, user) {
-        console.log(user);
         const post = new post_entity_1.Post();
         post.userId = user.id;
-        post.shareToken = shortid.generate();
         Object.assign(post, createPostDto);
         this.repo.create(post);
         return await this.repo.save(post);
-    }
-    async getPostByShareToken(shareToken) {
-        return this.repo.findOne({ where: { shareToken } });
     }
     async findAll(query) {
         const myQuery = this.repo
@@ -94,40 +85,12 @@ let PostService = class PostService {
         await this.repo.remove(post);
         return { success: true, post };
     }
-    async deletePost(postId, userId, userRole) {
-        const post = await this.repo.findOne({ where: { id: postId } });
-        if (!post) {
-            throw new common_1.NotFoundException('Blog post not found');
-        }
-        if (userRole === user_roles_models_1.UserRoles.Admin || post.userId === userId) {
-            await this.repo.remove(post);
-        }
-        else {
-            throw new common_1.ForbiddenException('You are not allowed to delete this post');
-        }
-    }
-    async getPostsForUser(userId, viewerId) {
-        const blockedUsers = viewerId ? await this.getUserBlockedUsers(viewerId) : [];
-        const query = this.repo
-            .createQueryBuilder('post')
-            .where('post.userId = :userId', { userId });
-        if (blockedUsers.length > 0) {
-            query.andWhere('post.userId NOT IN (:...blockedUsers)', { blockedUsers });
-        }
-        return query.getMany();
-    }
-    async getUserBlockedUsers(userId) {
-        const user = await this.userRepo.findOneBy({ id: userId });
-        return user ? user.blockList || [] : [];
-    }
 };
 exports.PostService = PostService;
 exports.PostService = PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(post_entity_1.Post)),
-    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        category_service_1.CategoryService,
-        typeorm_2.Repository])
+        category_service_1.CategoryService])
 ], PostService);
 //# sourceMappingURL=post.service.js.map
