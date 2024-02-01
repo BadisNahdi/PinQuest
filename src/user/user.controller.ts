@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpException,
+  HttpStatus,
   Param,
   Post,
   Req,
@@ -95,6 +96,20 @@ export class UserController {
       throw new BadRequestException('Failed to reset password');
     }
   }
+
+  @Get('profile/:userId')
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async getUserProfile(@Param('userId') userId: number, @Req() req: Request) {
+    try {
+      const user = await this.userService.getUserProfile(userId);
+      return user;
+    }
+    catch (NotFoundException) {
+      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+    }
+
+  }
+
   @Post('block/:userId')
   @UseGuards(AuthGuard('jwt'), ACGuard)
   async blockUser(@Param('userId') userId: number, @Req() req: Request) {

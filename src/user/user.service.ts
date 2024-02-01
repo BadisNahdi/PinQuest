@@ -202,4 +202,14 @@ export class UserService {
     user.blockList = user.blockList.filter((id) => id !== unblockedUserId);
     await this.repo.save(user);
   }
+
+  async getUserProfile(userId: number): Promise<User> {
+    const user = await this.repo.findOneBy({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
 }

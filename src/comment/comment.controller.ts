@@ -38,7 +38,7 @@ export class CommentController {
   }
 
   @Get('/:postId')
-  async getCommentsByPost(@Param() postId: number) {
+  async getCommentsByPost(@Param('postId') postId: number) {
     console.log("We Are Here");
     return await this.commentService.getCommentsByPost(postId);
   }
