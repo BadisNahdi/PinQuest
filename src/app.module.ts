@@ -8,6 +8,7 @@ import { roles } from './models/user-roles.models';
 import { UserModule } from './user/user.module';
 import * as dotenv from 'dotenv';
 import { AccessControlModule } from 'nest-access-control';
+import { CommentModule } from './comment/comment.module';
 dotenv.config();
 @Module({
   imports: [
@@ -22,10 +23,11 @@ dotenv.config();
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       autoLoadEntities: true,
-      entities: ["dist/**/*.entity{.ts,.js}"],
+      entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     AccessControlModule.forRoles(roles),
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

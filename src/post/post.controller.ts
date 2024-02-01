@@ -13,17 +13,21 @@ import {
   UseGuards,
   UseInterceptors,
   Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import {User_} from '../user/userv2.decorator'
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
-import { User } from '../User/entities/user.entity';
 import { ACGuard, UseRoles } from 'nest-access-control';
 import { FileInterceptor } from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
+import { UserRoles } from 'src/models/user-roles.models';
+import { Roles } from 'src/user/user.roles.decorator';
+import { Post as PostEntity } from './entities/post.entity';
+import { RolesGuard } from 'src/user/user.roles.guard';
+import { CurrentUser } from 'src/user/user.decorator';
+import { Request } from 'express';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,16 +36,20 @@ export class PostController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), ACGuard)
-  @UseRoles({
-    resource: 'posts',
-    action: 'create',
-    possession: 'any',
-  })
-  create(@Body() createPostDto: CreatePostDto, @User_() user) {
+  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user) {
+    console.log(user);
     return this.postService.create(createPostDto, user);
   }
 
-  // Upload Picture to Server
+  @Get('search')
+  async searchPosts(
+    @Query('hashtags') hashtags: string,
+    @Query('title') title: string,
+  ) {
+    const hashtagArray = hashtags ? hashtags.split(',') : [];
+    return this.postService.searchPosts(hashtagArray, title);
+  }
+
   @Post('upload-photo')
   @UseInterceptors(
     FileInterceptor('picture', {
@@ -76,16 +84,19 @@ export class PostController {
     }
   }
 
-  //  GET Photos
   @Get('pictures/:fileId')
   async serveAvatar(@Param('fileId') fileId, @Res() res): Promise<any> {
     res.sendFile(fileId, { root: './uploads' });
   }
 
   @Get()
-  findAll(@Query() query: any) {
-    // We are only targeting query parameters, slug and sort
-    return this.postService.findAll(query);
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async findAll(@Req() req: Request, @Query() query: any) {
+    if (req.user == undefined) {
+      console.log(req.user);
+      return this.postService.findAll(query);
+    }
+    return this.postService.findWithBlocked(req.user.id, query);
   }
 
   @Get(':id')
@@ -110,13 +121,29 @@ export class PostController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  remove(
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; post: PostEntity }> {
+    if (!this.postService.findOne(+id)) {
+      throw new NotFoundException('Could not find the post to delete');
+    }
+    return this.postService.remove(+id);
+  }
+  @Get('share/:shareToken')
+  async getPostByShareToken(@Param('shareToken') shareToken: string) {
+    const post = await this.postService.getPostByShareToken(shareToken);
+    return post;
+  }
+  @Get('user/:userId')
   @UseGuards(AuthGuard('jwt'), ACGuard)
   @UseRoles({
     resource: 'posts',
-    action: 'delete',
+    action: 'read',
     possession: 'any',
   })
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  async getPostsForUser(@Param('userId') userId: number, @Req() req: Request) {
+    return this.postService.getPostsForUser(userId, req.user.id);
   }
 }

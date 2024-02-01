@@ -1,8 +1,14 @@
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  BeforeInsert,
+} from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Post } from '../../post/entities/post.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 import { UserRoles } from '../../models/user-roles.models';
-
 
 @Entity('users')
 export class User {
@@ -21,17 +27,40 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @Column({ default: null })
+  @Column({
+    default:
+      'https://repertoire-artistestunisiens.com/wp-content/uploads/2016/09/samir-loussif-300x300.jpg',
+  })
   profilePic: string;
 
-  @Column({ type: 'enum', enum: UserRoles, enumName: 'roles', default: UserRoles.Reader })
+  @Column({
+    type: 'enum',
+    enum: UserRoles,
+    enumName: 'roles',
+    default: UserRoles.Reader,
+  })
   roles: UserRoles;
 
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
+
   @BeforeInsert()
   hashPass() {
     this.password = bcryptjs.hashSync(this.password, 10);
   }
+  @Column({ nullable: true })
+  resetToken: string;
+
+  @Column({ type: 'simple-array', nullable: true })
+  blockList: number[];
+
+  @Column({ nullable: true })
+  place: string;
+  @Column({ nullable: true })
+  bio: string;
+  @Column({ nullable: true })
+  birthday: Date;
 }

@@ -6,19 +6,18 @@ import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from '../User/entities/user.entity';
 import { CategoryService } from '../category/category.service';
-
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post) private readonly repo: Repository<Post>,
     private catService: CategoryService,
-  ) {}
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+  ) { }
 
   async create(createPostDto: CreatePostDto, user: User) {
     const post = new Post();
     post.userId = user.id;
     Object.assign(post, createPostDto);
-
     this.repo.create(post);
     return await this.repo.save(post);
   }
@@ -29,20 +28,16 @@ export class PostService {
       .leftJoinAndSelect('post.category', 'category')
       .leftJoinAndSelect('post.user', 'user');
 
-    // check if query is present
     if (!(Object.keys(query).length === 0) && query.constructor === Object) {
       const queryKeys = Object.keys(query); // get the keys of the query string
 
-      // check if slug key is present
       if (queryKeys.includes('slug')) {
         myQuery.where('post.slug LIKE :slug', { slug: `%${query['slug']}%` });
       }
-      // check if sort key is present, we will sort by Title field only
       if (queryKeys.includes('sort')) {
-        myQuery.orderBy('post.title', query['sort'].toUpperCase());
+        myQuery.orderBy('post.updatedAt', 'DESC');
       }
 
-      // check if category is present, show only selected category items
       if (queryKeys.includes('category')) {
         myQuery.andWhere('category.title = :cat', { cat: query['category'] });
       }
@@ -53,9 +48,21 @@ export class PostService {
     }
   }
 
+  async findWithBlocked(userId?: number, query?: string) {
+    const allPosts = await this.findAll(query);
+    // console.log('posts', allPosts);
+    let blockedUsers = await this.getUserBlockedUsers(userId);
+    // console.log('blocked', blockedUsers);
+    blockedUsers = blockedUsers.map(Number);
+    const filteredPosts = allPosts.filter(
+      (post) => !blockedUsers.includes(post.user.id),
+    );
+    // console.log(filteredPosts);
+    return filteredPosts;
+  }
   async findOne(id: number) {
     try {
-      const post = await this.repo.findOneOrFail({where: {id : id}});
+      const post = await this.repo.findOneOrFail({ where: { id: id } });
       return post;
     } catch (err) {
       throw new BadRequestException('Post not found');
@@ -78,15 +85,59 @@ export class PostService {
       throw new BadRequestException('post not found');
     }
 
-    post.modifiedOn = new Date(Date.now());
     post.category = updatePostDto.category;
     Object.assign(post, updatePostDto);
     return this.repo.save(post);
   }
 
   async remove(id: number) {
-    const post = await this.repo.findOneBy({id});
+    const post = await this.repo.findOneBy({ id });
     await this.repo.remove(post);
     return { success: true, post };
+  }
+
+  async searchPosts(hashtags: string[], title: string): Promise<Post[]> {
+    const queryBuilder = this.repo.createQueryBuilder('post');
+
+    if (title) {
+      queryBuilder.where('post.title LIKE :title', { title: `%${title}%` });
+    }
+
+    if (hashtags && hashtags.length > 0) {
+      hashtags.forEach((hashtag, index) => {
+        const query = `FIND_IN_SET(:hashtag${index}, post.hashtags)`;
+        if (index === 0 && !title) {
+          queryBuilder.where(query, { [`hashtag${index}`]: hashtag });
+        } else {
+          queryBuilder.orWhere(query, { [`hashtag${index}`]: hashtag });
+        }
+      });
+    }
+
+    return await queryBuilder.getMany();
+  }
+
+  async getPostsForUser(userId: number, viewerId?: number): Promise<Post[]> {
+    const blockedUsers = viewerId
+      ? await this.getUserBlockedUsers(viewerId)
+      : [];
+    const query = this.repo
+      .createQueryBuilder('post')
+      .where('post.userId = :userId', { userId });
+
+    if (blockedUsers.length > 0) {
+      query.andWhere('post.userId NOT IN (:...blockedUsers)', { blockedUsers });
+    }
+
+    return query.getMany();
+  }
+
+  async getPostByShareToken(shareToken: string): Promise<Post> {
+    return this.repo.findOne({ where: { shareToken } });
+  }
+
+  private async getUserBlockedUsers(userId: number): Promise<number[]> {
+    const user = await this.userRepo.findOneBy({ id: userId });
+    return user ? user.blockList || [] : [];
   }
 }
