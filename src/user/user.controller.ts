@@ -27,24 +27,20 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('login')
-  @HttpCode(200) // Specify the desired status code
+  @HttpCode(200)
   async loginUser(@Body() loginDto: any, @Res() res: Response) {
     try {
       const { token, user } = await this.userService.login(
         loginDto as UserLoginDto,
       );
 
-      // Set cookies
       res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
       res.cookie('Authentication', token, {
         httpOnly: true,
         maxAge: 2 * 60 * 60 * 1000,
       });
-
-      // Send response with 200 status
       return res.send({ success: true, user, token });
     } catch (UnauthorizedException) {
-      // Handle errors, possibly return a different status code
       throw new HttpException('bad creds', 400);
     }
   }

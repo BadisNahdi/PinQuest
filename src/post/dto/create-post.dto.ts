@@ -22,9 +22,6 @@ export class CreatePostDto {
   @Type(() => Number)
   categoryId: number;
 
-  @IsOptional()
-  category: Category;
-
   @IsString()
   mainImageUrl: string;
 

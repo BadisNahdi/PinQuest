@@ -18,11 +18,7 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  const config = new DocumentBuilder()
-    .setTitle('CMS Blog')
-    .setDescription('The blog API for professionals')
-    .setVersion('1.0')
-    .build();
+  const config = new DocumentBuilder().setTitle('PinQuest').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('/', app, document);
 

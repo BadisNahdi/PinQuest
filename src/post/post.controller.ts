@@ -36,7 +36,10 @@ export class PostController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), ACGuard)
-  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user) {
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUser() user,
+  ): Promise<PostEntity> {
     console.log(user);
     return this.postService.create(createPostDto, user);
   }
@@ -45,7 +48,7 @@ export class PostController {
   async searchPosts(
     @Query('hashtags') hashtags: string,
     @Query('title') title: string,
-  ) {
+  ): Promise<PostEntity[]> {
     const hashtagArray = hashtags ? hashtags.split(',') : [];
     return this.postService.searchPosts(hashtagArray, title);
   }
@@ -91,7 +94,10 @@ export class PostController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'), ACGuard)
-  async findAll(@Req() req: Request, @Query() query: any) {
+  async findAll(
+    @Req() req: Request,
+    @Query() query: any,
+  ): Promise<PostEntity[]> {
     if (req.user == undefined) {
       console.log(req.user);
       return this.postService.findAll(query);

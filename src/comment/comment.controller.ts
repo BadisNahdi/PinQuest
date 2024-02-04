@@ -16,30 +16,31 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { ACGuard, UseRoles } from 'nest-access-control';
+import { Comment } from './entities/comment.entity';
 
 @UseGuards(AuthGuard('jwt'), ACGuard)
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) { }
+  constructor(private readonly commentService: CommentService) {}
   @Post()
   async create(
     @Req() req: Request,
     @Body() createCommentDto: CreateCommentDto,
-  ) {
+  ): Promise<Comment> {
     try {
       return await this.commentService.create(createCommentDto, req.user.id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException(error.message);
       }
-      console.log(req.user)
+      console.log(req.user);
       throw new BadRequestException('Invalid data');
     }
   }
 
   @Get('/:postId')
-  async getCommentsByPost(@Param('postId') postId: number) {
-    console.log("We Are Here");
+  async getCommentsByPost(@Param('postId') postId: number): Promise<Comment[]> {
+    console.log('We Are Here');
     return await this.commentService.getCommentsByPost(postId);
   }
 
@@ -52,7 +53,7 @@ export class CommentController {
   async update(
     @Param('id') id: number,
     @Body() updateCommentDto: UpdateCommentDto,
-  ) {
+  ): Promise<Comment> {
     try {
       return await this.commentService.update(id, updateCommentDto);
     } catch (error) {
