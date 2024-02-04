@@ -120,4 +120,10 @@ export class UserController {
     await this.userService.unblockUser(req.user.id, userId);
     return 'User unblocked successfully';
   }
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async getCurrentUser(@CurrentUser() user: User) {
+    return user;
+  }
 }
