@@ -59,6 +59,7 @@ export class UserController {
   @Get('authstatus')
   @UseGuards(ApplyUser)
   authStatus(@CurrentUser() user: User) {
+    console.log(user);
     return { status: !!user, user };
   }
   @Post('forgot-password')
@@ -119,5 +120,11 @@ export class UserController {
   async unblockUser(@Param('userId') userId: number, @Req() req: Request) {
     await this.userService.unblockUser(req.user.id, userId);
     return 'User unblocked successfully';
+  }
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'), ACGuard)
+  async getCurrentUser(@CurrentUser() user: User) {
+    return user;
   }
 }
