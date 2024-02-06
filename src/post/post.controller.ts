@@ -102,6 +102,7 @@ export class PostController {
       console.log(req.user);
       return this.postService.findAll(query);
     }
+    console.log(query);
     return this.postService.findWithBlocked(req.user.id, query);
   }
 

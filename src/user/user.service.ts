@@ -93,7 +93,7 @@ export class UserService {
       },
     });
 
-    const resetLink = `http://127.0.0.1:5000/api/auth/reset-password?token=${resetToken}`;
+    const resetLink = `http://127.0.0.1:5000/api/auth/reset-password/${resetToken}`;
 
     const mailOptions = {
       from: 'nesttest720@gmail.com',
