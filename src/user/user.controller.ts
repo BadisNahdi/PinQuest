@@ -21,6 +21,9 @@ import { User } from './entities/user.entity';
 import { CurrentUser } from './user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { ACGuard } from 'nest-access-control';
+import { RolesGuard } from './user.roles.guard';
+import { Roles } from './user.roles.decorator';
+import { UserRoles } from 'src/models/user-roles.models';
 
 @Controller('auth')
 export class UserController {
@@ -34,17 +37,14 @@ export class UserController {
         loginDto as UserLoginDto,
       );
 
-      // Set cookies
-      res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
-      res.cookie('Authentication', token, {
-        httpOnly: true,
-        maxAge: 2 * 60 * 60 * 1000,
-      });
+      // res.cookie('IsAuthenticated', true, { maxAge: 2 * 60 * 60 * 1000 });
+      // res.cookie('Authentication', token, {
+      //   httpOnly: true,
+      //   maxAge: 2 * 60 * 60 * 1000,
+      // });
 
-      // Send response with 200 status
       return res.send({ success: true, user, token });
     } catch (UnauthorizedException) {
-      // Handle errors, possibly return a different status code
       throw new HttpException('bad creds', 400);
     }
   }
@@ -124,4 +124,13 @@ export class UserController {
     await this.userService.unblockUser(req.user.id, userId);
     return 'User unblocked successfully';
   }
+
+  @Get('users-number')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async usersNumber() {
+    console.log(this.userService.usersNumber());
+    return this.userService.usersNumber();
+  }
+  
 }

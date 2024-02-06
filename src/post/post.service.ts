@@ -150,4 +150,12 @@ export class PostService {
     const user = await this.userRepo.findOneBy({ id: userId });
     return user ? user.blockList || [] : [];
   }
+
+  async postsNumber() {
+    return await this.repo.count();
+  }
+
+  reportedPostsNumber() {
+    return this.repo.count({ where: { isReported: true } });
+  }
 }

@@ -210,4 +210,8 @@ export class UserService {
     }
     return user;
   }
+
+  async usersNumber(): Promise<number> {
+    return await this.repo.count();
+  }
 }

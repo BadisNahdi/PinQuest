@@ -35,6 +35,27 @@ import { get } from 'http';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Get('number')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async postsNumber() {
+    return this.postService.postsNumber();
+  }
+
+  @Get('reported-number')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async reportedPostsNumber() {
+    return this.postService.reportedPostsNumber();
+  }
+
+  @Get('reported')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async getReportedPosts() {
+    return this.postService.getReportedPosts();
+  }
+
   @Post()
   @UseGuards(AuthGuard('jwt'), ACGuard)
   create(@Body() createPostDto: CreatePostDto, @CurrentUser() user) {
@@ -138,12 +159,7 @@ export class PostController {
     }
     return this.postService.remove(+id);
   }
-  @Get('reported')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(UserRoles.Admin)
-  async getReportedPosts() {
-    return this.postService.getReportedPosts();
-  }
+  
   @Get('delete-repot/:id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(UserRoles.Admin)
@@ -166,4 +182,6 @@ export class PostController {
   async getPostsForUser(@Param('userId') userId: number, @Req() req: Request) {
     return this.postService.getPostsForUser(userId, req.user.id);
   }
+
+  
 }
