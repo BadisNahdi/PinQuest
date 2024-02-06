@@ -63,4 +63,7 @@ export class Post extends TimestampEntities {
   }
   @Column({ nullable: true })
   shareToken: string;
+
+  @Column({ default: false})
+  isReported: boolean;
 }

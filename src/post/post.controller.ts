@@ -28,6 +28,7 @@ import { Post as PostEntity } from './entities/post.entity';
 import { RolesGuard } from 'src/user/user.roles.guard';
 import { CurrentUser } from 'src/user/user.decorator';
 import { Request } from 'express';
+import { get } from 'http';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -48,6 +49,11 @@ export class PostController {
   ) {
     const hashtagArray = hashtags ? hashtags.split(',') : [];
     return this.postService.searchPosts(hashtagArray, title);
+  }
+
+  @Get('report/:id')
+  async reportPost(@Param('id') id: number) {
+    return this.postService.reportPost(id);
   }
 
   @Post('upload-photo')
@@ -71,6 +77,7 @@ export class PostController {
       },
     }),
   )
+  
   uploadPhoto(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
       return {
@@ -131,6 +138,19 @@ export class PostController {
     }
     return this.postService.remove(+id);
   }
+  @Get('reported')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async getReportedPosts() {
+    return this.postService.getReportedPosts();
+  }
+  @Get('delete-repot/:id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(UserRoles.Admin)
+  async deletereport(@Param('id') id: number) {
+    return this.postService.deletereport(id);
+  }
+
   @Get('share/:shareToken')
   async getPostByShareToken(@Param('shareToken') shareToken: string) {
     const post = await this.postService.getPostByShareToken(shareToken);

@@ -31,8 +31,8 @@ export class PostService {
     if (!(Object.keys(query).length === 0) && query.constructor === Object) {
       const queryKeys = Object.keys(query); // get the keys of the query string
 
-      if (queryKeys.includes('slug')) {
-        myQuery.where('post.slug LIKE :slug', { slug: `%${query['slug']}%` });
+      if (queryKeys.includes('title')) {
+        myQuery.where('post.title LIKE :title', { title: `%${query['title']}%` });
       }
       if (queryKeys.includes('sort')) {
         myQuery.orderBy('post.updatedAt', 'DESC');
@@ -46,6 +46,10 @@ export class PostService {
     } else {
       return await myQuery.getMany();
     }
+  }
+
+  async getReportedPosts() {
+    return await this.repo.find({ where: { isReported: true } });
   }
 
   async findWithBlocked(userId?: number, query?: string) {
@@ -96,6 +100,12 @@ export class PostService {
     return { success: true, post };
   }
 
+  deletereport(id: number) {
+    return this.repo.update(id, { isReported: false });
+  }
+  reportPost(id: number) {
+    return this.repo.update(id, { isReported: true });
+  }
   async searchPosts(hashtags: string[], title: string): Promise<Post[]> {
     const queryBuilder = this.repo.createQueryBuilder('post');
 

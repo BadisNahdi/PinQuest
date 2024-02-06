@@ -22,7 +22,7 @@ export class UserService {
     private readonly jwtStrategy: JwtStrategy,
     @InjectRepository(User) private readonly repo: Repository<User>,
     private jwt: JwtService,
-  ) {}
+  ) { }
 
   async login(loginDto: UserLoginDto) {
     const user = await this.repo
@@ -78,7 +78,7 @@ export class UserService {
     const user = await this.repo.findOne({ where: { email } });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException('User not found');
     }
 
     const resetToken = this.jwtStrategy.generateResetToken(email);

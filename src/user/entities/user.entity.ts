@@ -61,6 +61,5 @@ export class User {
   place: string;
   @Column({ nullable: true })
   bio: string;
-  @Column({ nullable: true })
-  birthday: Date;
+  
 }
